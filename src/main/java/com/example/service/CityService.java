@@ -1,25 +1,23 @@
 package com.example.service;
 
+import com.example.model.City;
 import com.example.repository.CityRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.model.City;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CityService {
     private final CityRepository cityRepository;
 
-
     public CityService(CityRepository cityRepository) {
         this.cityRepository = cityRepository;
-
     }
 
     @Transactional
     public Long addCity(City city) {
-
         return cityRepository.save(city);
     }
 
@@ -35,40 +33,41 @@ public class CityService {
 
     @Transactional
     public void updateCity(City city) {
-
         cityRepository.update(city);
     }
 
     @Transactional
     public void deleteCity(City city) {
-
         cityRepository.delete(city);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Double getAverageCarCode(){
         return cityRepository.getAverageCarCode();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Double getSumOfTimezones(){
         return cityRepository.getSumOfTimezones();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<City> getCitiesWithTimezoneLessThan(int timezone){
         return cityRepository.getCitiesWithTimezoneLessThan(timezone);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Double calculateDistanceToTheMostPopulatedCity(){
         return cityRepository.calculateDistanceToTheMostPopulatedCity();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Double calculateDistanceToNewestCity(){
         return cityRepository.calculateDistanceToNewestCity();
     }
 
-
+    @Transactional(readOnly = true)
+    public List<City> getCitiesWithFiltersAndSort(Map<String, String> filters, String sortBy, String sortDirection) {
+        return cityRepository.findWithFiltersAndSort(filters, sortBy, sortDirection);
+    }
 }
