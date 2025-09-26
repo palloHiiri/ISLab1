@@ -1,46 +1,69 @@
-import { cityService } from "../services/cityService.js";
-import CityForm from "./cityForm.jsx";
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { cityService } from '../services/cityService';
 import CityTable from "./cityTable.jsx";
-import React from "react";
+import CityForm from "./cityForm.jsx";
+import './CityList.css';
 
 const CityList = () => {
-    const [cities, setCities] = React.useState([]);
-    const [loading, setLoading] = React.useState(true);
-    const [error, setError] = React.useState('');
-    const [editingCity, setEditingCity] = React.useState(null);
-    const [showForm, setShowForm] = React.useState(false);
-    const [searchId, setSearchId] = React.useState('');
-    const [searchedCity, setSearchedCity] = React.useState(null);
-    const [showSearchModal, setShowSearchModal] = React.useState(false);
-    const [searchLoading, setSearchLoading] = React.useState(false);
-    const [searchError, setSearchError] = React.useState('');
+    const navigate = useNavigate(); // Хук для навигации
 
-    // Пагинация
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [itemsPerPage] = React.useState(5);
+    const [cities, setCities] = useState({ cities: [], totalItems: 0, totalPages: 0 });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [editingCity, setEditingCity] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [searchId, setSearchId] = useState('');
+    const [searchedCity, setSearchedCity] = useState(null);
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState('');
+    const [autoRefresh, setAutoRefresh] = useState(true);
 
-    React.useEffect(() => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage] = useState(5);
+
+    const intervalRef = useRef(null);
+
+    // Функция для перехода на страницу спец функций
+    const goToSpecialFunctions = () => {
+        navigate('/special-functions');
+    };
+
+    useEffect(() => {
         fetchCities();
-    }, []);
+
+        if (autoRefresh) {
+            intervalRef.current = setInterval(() => {
+                fetchCities();
+            }, 2000);
+        }
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [currentPage, autoRefresh]);
 
     const fetchCities = async () => {
         try {
-            setLoading(true);
-            const data = await cityService.getAllCities();
+            if (!cities.cities || cities.cities.length === 0) {
+                setLoading(true);
+            }
+
+            console.log('Fetching cities, page:', currentPage, 'size:', itemsPerPage);
+            const data = await cityService.getAllCities(currentPage, itemsPerPage);
+            console.log('Received data:', data);
             setCities(data);
             setError('');
         } catch (error) {
-            setError('Failed to fetch cities');
+            console.error('Fetch error:', error);
+            setError('Failed to fetch cities: ' + error.message);
         } finally {
             setLoading(false);
         }
     };
-
-    // Расчет данных для пагинации
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentCities = cities.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(cities.length / itemsPerPage);
 
     const handleSearchById = async () => {
         if (!searchId.trim()) return;
@@ -48,11 +71,14 @@ const CityList = () => {
         try {
             setSearchLoading(true);
             setSearchError('');
+            console.log('Searching for city ID:', searchId);
             const city = await cityService.getCityById(searchId);
+            console.log('Found city:', city);
             setSearchedCity(city);
             setShowSearchModal(true);
         } catch (error) {
-            setSearchError('City not found or error fetching city');
+            console.error('Search error:', error);
+            setSearchError('City not found or error fetching city: ' + error.message);
             setSearchedCity(null);
         } finally {
             setSearchLoading(false);
@@ -74,24 +100,27 @@ const CityList = () => {
             try {
                 await cityService.deleteCity(id);
                 await fetchCities();
-                // Если удалили последний элемент на странице - переходим на предыдущую
-                if (currentCities.length === 1 && currentPage > 1) {
-                    setCurrentPage(currentPage - 1);
-                }
             } catch (error) {
-                setError('Failed to delete city');
+                setError('Failed to delete city: ' + error.message);
             }
         }
     };
 
     const handleSaveCity = async () => {
         setShowForm(false);
+        setEditingCity(null);
         await fetchCities();
     };
 
     const handleCancel = () => {
         setShowForm(false);
         setEditingCity(null);
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 0 && newPage < cities.totalPages) {
+            setCurrentPage(newPage);
+        }
     };
 
     const closeSearchModal = () => {
@@ -101,78 +130,58 @@ const CityList = () => {
         setSearchId('');
     };
 
-    // Функции для пагинации
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    const nextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
+    const handleManualRefresh = async () => {
+        setLoading(true);
+        await fetchCities();
     };
 
-    const prevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    // Генерация номеров страниц
-    const getPageNumbers = () => {
-        const pageNumbers = [];
-        const maxVisiblePages = 5;
-
-        if (totalPages <= maxVisiblePages) {
-            for (let i = 1; i <= totalPages; i++) {
-                pageNumbers.push(i);
-            }
-        } else {
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-            for (let i = startPage; i <= endPage; i++) {
-                pageNumbers.push(i);
-            }
-        }
-
-        return pageNumbers;
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="error">{error}</div>;
+    if (loading && (!cities.cities || cities.cities.length === 0)) {
+        return (
+            <div className="city-list">
+                <div className="loading">
+                    <h2>Loading cities...</h2>
+                    <p>Please wait while we fetch the data.</p>
+                </div>
+            </div>
+        );
     }
 
     return (
         <div className="city-list">
             <div className="header">
-                <h1>Cities</h1>
+                <h1>Cities Management</h1>
 
-                {/* Поиск по ID */}
-                <div className="search-container">
-                    <input
-                        type="number"
-                        placeholder="Enter city ID"
-                        value={searchId}
-                        onChange={(e) => setSearchId(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSearchById()}
-                        className="search-input"
-                    />
-                    <button
-                        onClick={handleSearchById}
-                        disabled={!searchId.trim() || searchLoading}
-                        className="search-btn"
-                    >
-                        {searchLoading ? 'Searching...' : 'Search by ID'}
+                <div className="header-controls">
+                    <div className="search-container">
+                        <input
+                            type="number"
+                            placeholder="Enter city ID"
+                            value={searchId}
+                            onChange={(e) => setSearchId(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearchById()}
+                            className="search-input"
+                        />
+                        <button
+                            onClick={handleSearchById}
+                            disabled={!searchId.trim() || searchLoading}
+                            className="btn-secondary"
+                        >
+                            {searchLoading ? 'Searching...' : 'Search by ID'}
+                        </button>
+                    </div>
+
+                    <button onClick={handleAddCity} disabled={showForm} className="btn-primary">
+                        Add New City
+                    </button>
+
+                    {/* Кнопка с React Router навигацией */}
+                    <button onClick={goToSpecialFunctions} className="btn-special">
+                        📊 Special Functions
                     </button>
                 </div>
-
-                <button onClick={handleAddCity} disabled={showForm}>
-                    Add City
-                </button>
             </div>
+
+            {error && <div className="error-message">Error: {error}</div>}
 
             {showForm ? (
                 <CityForm
@@ -183,50 +192,65 @@ const CityList = () => {
             ) : (
                 <>
                     <div className="stats">
-                        <p>Total Cities: {cities.length}</p>
-                        <p>Showing {currentCities.length} of {cities.length} cities</p>
-                        <p>Page {currentPage} of {totalPages}</p>
+                        <span>Total Cities: {cities.totalItems || 0}</span>
+                        <span>Page {currentPage + 1} of {cities.totalPages || 1}</span>
+                        <span>Showing {cities.cities ? cities.cities.length : 0} cities</span>
+                        <span className="last-updated">
+                            Last updated: {new Date().toLocaleTimeString()}
+                        </span>
                     </div>
 
-                    <CityTable
-                        cities={currentCities}
-                        onEdit={handleEditCity}
-                        onDelete={handleDeleteCity}
-                    />
+                    {cities.cities && cities.cities.length > 0 ? (
+                        <>
+                            <CityTable
+                                cities={cities.cities}
+                                onEdit={handleEditCity}
+                                onDelete={handleDeleteCity}
+                            />
 
-                    {/* Пагинация */}
-                    {cities.length > itemsPerPage && (
-                        <div className="pagination">
-                            <button
-                                onClick={prevPage}
-                                disabled={currentPage === 1}
-                                className="pagination-btn"
-                            >
-                                Previous
-                            </button>
+                            {cities.totalPages > 1 && (
+                                <div className="pagination">
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 0}
+                                        className="pagination-btn"
+                                    >
+                                        Previous
+                                    </button>
 
-                            {getPageNumbers().map(number => (
-                                <button
-                                    key={number}
-                                    onClick={() => paginate(number)}
-                                    className={`pagination-btn ${currentPage === number ? 'active' : ''}`}
-                                >
-                                    {number}
-                                </button>
-                            ))}
+                                    {Array.from({ length: cities.totalPages }, (_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => handlePageChange(i)}
+                                            className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
 
-                            <button
-                                onClick={nextPage}
-                                disabled={currentPage === totalPages}
-                                className="pagination-btn"
-                            >
-                                Next
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === cities.totalPages - 1}
+                                        className="pagination-btn"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="no-data">
+                            <h3>No cities found</h3>
+                            <p>There are no cities to display at the moment.</p>
+                            <button onClick={handleManualRefresh} className="btn-secondary">
+                                Refresh List
                             </button>
                         </div>
                     )}
                 </>
             )}
 
+            {/* Модальное окно поиска */}
             {showSearchModal && (
                 <div className="modal-overlay" onClick={closeSearchModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -236,7 +260,7 @@ const CityList = () => {
                         </div>
 
                         {searchError && (
-                            <div className="error">{searchError}</div>
+                            <div className="error-message">{searchError}</div>
                         )}
 
                         {searchedCity && (
@@ -248,40 +272,39 @@ const CityList = () => {
                                     <strong>Name:</strong> {searchedCity.name}
                                 </div>
                                 <div className="detail-row">
-                                    <strong>Population:</strong> {searchedCity.population}
+                                    <strong>Coordinates:</strong>
+                                    X: {searchedCity.coordinates?.x}, Y: {searchedCity.coordinates?.y}
                                 </div>
                                 <div className="detail-row">
                                     <strong>Area:</strong> {searchedCity.area}
                                 </div>
-                                {searchedCity.coordinates && (
-                                    <div className="detail-row">
-                                        <strong>Coordinates:</strong>
-                                        X: {searchedCity.coordinates.x},
-                                        Y: {searchedCity.coordinates.y}
-                                    </div>
-                                )}
-                                {searchedCity.creationDate && (
-                                    <div className="detail-row">
-                                        <strong>Creation Date:</strong> {new Date(searchedCity.creationDate).toLocaleDateString()}
-                                    </div>
-                                )}
-                                {searchedCity.establishmentDate && (
                                 <div className="detail-row">
-                                    <strong>Establishment Date:</strong> {new Date(searchedCity.establishmentDate).toLocaleDateString()}
+                                    <strong>Population:</strong> {searchedCity.population?.toLocaleString()}
                                 </div>
-                                )}
-                                {searchedCity.capital !== undefined && (
-                                    <div className="detail-row">
-                                        <strong>Capital:</strong> {searchedCity.capital ? 'Yes' : 'No'}
-                                    </div>
-                                )}
-                                {searchedCity.metersAboveSeaLevel !== undefined && (
-                                    <div className="detail-row">
-                                        <strong>Meters Above Sea Level:</strong> {searchedCity.metersAboveSeaLevel}
-                                    </div>
-                                )
-                                }
-
+                                <div className="detail-row">
+                                    <strong>Creation Date:</strong> {searchedCity.creationDate ? new Date(searchedCity.creationDate).toLocaleDateString() : 'N/A'}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Establishment Date:</strong> {searchedCity.establishmentDate ? new Date(searchedCity.establishmentDate).toLocaleDateString() : 'N/A'}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Capital:</strong> {searchedCity.capital ? 'Yes' : 'No'}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Meters Above Sea Level:</strong> {searchedCity.metersAboveSeaLevel || 'N/A'}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Timezone:</strong> {searchedCity.timezone}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Car Code:</strong> {searchedCity.carCode || 'N/A'}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Government:</strong> {searchedCity.government}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Governor:</strong> {searchedCity.governor?.name || 'N/A'}
+                                </div>
                             </div>
                         )}
 
@@ -292,209 +315,18 @@ const CityList = () => {
                                         handleEditCity(searchedCity);
                                         closeSearchModal();
                                     }}
-                                    className="edit-btn"
+                                    className="btn-primary"
                                 >
                                     Edit This City
                                 </button>
                             )}
-                            <button onClick={closeSearchModal} className="cancel-btn">
+                            <button onClick={closeSearchModal} className="btn-secondary">
                                 Close
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-
-            <style jsx>{`
-                .header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 20px;
-                    flex-wrap: wrap;
-                    gap: 15px;
-                }
-
-                .search-container {
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                }
-
-                .search-input {
-                    padding: 8px 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    width: 150px;
-                }
-
-                .search-btn {
-                    padding: 8px 16px;
-                    background-color: #007bff;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-
-                .search-btn:disabled {
-                    background-color: #ccc;
-                    cursor: not-allowed;
-                }
-
-                .stats {
-                    display: flex;
-                    gap: 20px;
-                    margin-bottom: 15px;
-                    flex-wrap: wrap;
-                }
-
-                .stats p {
-                    margin: 0;
-                    padding: 8px 12px;
-                    background-color: gray;
-                    border-radius: 4px;
-                    font-size: 14px;
-                }
-
-                .pagination {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 8px;
-                    margin-top: 20px;
-                    flex-wrap: wrap;
-                }
-
-                .pagination-btn {
-                    padding: 8px 12px;
-                    border: 1px solid #ddd;
-                    background-color: white;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    min-width: 40px;
-                    transition: all 0.2s;
-                }
-
-                .pagination-btn:hover:not(:disabled) {
-                    background-color: #f8f9fa;
-                }
-
-                .pagination-btn:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-
-                .pagination-btn.active {
-                    background-color: #007bff;
-                    color: white;
-                    border-color: #007bff;
-                }
-
-                .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 1000;
-                }
-
-                .modal-content {
-                    background: dimgray;
-                    padding: 20px;
-                    border-radius: 8px;
-                    max-width: 500px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                }
-
-                .modal-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 20px;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 10px;
-                }
-
-                .close-btn {
-                    background: none;
-                    border: none;
-                    font-size: 24px;
-                    cursor: pointer;
-                    color: #999;
-                }
-
-                .close-btn:hover {
-                    color: #333;
-                }
-
-                .city-details {
-                    margin: 20px 0;
-                }
-
-                .detail-row {
-                    margin: 10px 0;
-                    padding: 8px;
-                    border-bottom: 1px solid #f0f0f0;
-                }
-
-                .modal-actions {
-                    display: flex;
-                    gap: 10px;
-                    justify-content: flex-end;
-                    margin-top: 20px;
-                }
-
-                .edit-btn {
-                    background-color: #28a745;
-                    color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-
-                .cancel-btn {
-                    background-color: #6c757d;
-                    color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-
-                @media (max-width: 768px) {
-                    .header {
-                        flex-direction: column;
-                        align-items: stretch;
-                    }
-                    
-                    .search-container {
-                        justify-content: center;
-                    }
-                    
-                    .stats {
-                        flex-direction: column;
-                        gap: 10px;
-                    }
-                    
-                    .pagination {
-                        gap: 4px;
-                    }
-                    
-                    .pagination-btn {
-                        padding: 6px 10px;
-                        min-width: 35px;
-                    }
-                }
-            `}</style>
         </div>
     );
 };

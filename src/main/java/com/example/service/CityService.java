@@ -10,16 +10,16 @@ import java.util.List;
 @Service
 public class CityService {
     private final CityRepository cityRepository;
-    private final WebSocketService webSocketService;
 
-    public CityService(CityRepository cityRepository, WebSocketService webSocketService) {
+
+    public CityService(CityRepository cityRepository) {
         this.cityRepository = cityRepository;
-        this.webSocketService = webSocketService;
+
     }
 
     @Transactional
     public Long addCity(City city) {
-        webSocketService.cityCreated(city);
+
         return cityRepository.save(city);
     }
 
@@ -35,13 +35,13 @@ public class CityService {
 
     @Transactional
     public void updateCity(City city) {
-        webSocketService.cityUpdated(city);
+
         cityRepository.update(city);
     }
 
     @Transactional
     public void deleteCity(City city) {
-        webSocketService.cityDeleted(city);
+
         cityRepository.delete(city);
     }
 

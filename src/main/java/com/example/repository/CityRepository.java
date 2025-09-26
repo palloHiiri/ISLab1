@@ -67,10 +67,17 @@ public class CityRepository {
         }
     }
 
-    public Double getSumOfTimezones(){
+    public Double getSumOfTimezones() {
         try (Session session = sessionFactory.openSession()) {
-            Query<Double> query = session.createQuery("select sum(t.timezone) from City t", Double.class);
-            return query.getSingleResult();
+            Query<Long> sumQuery = session.createQuery("select sum(cast(c.timezone as long)) from City c where c.timezone is not null", Long.class);
+            Long result = sumQuery.uniqueResult();
+            System.out.println("Sum query result: " + result);
+
+            return result != null ? result.doubleValue() : 0.0;
+
+        } catch (Exception e) {
+            System.err.println("Error in getSumOfTimezones: " + e.getMessage());
+            return 0.0;
         }
     }
 
@@ -90,21 +97,97 @@ public class CityRepository {
         }
     }
 
-    public Double calculateDistanceToTheMostPopulatedCity(){
+    public Double calculateDistanceToTheMostPopulatedCity() {
         try (Session session = sessionFactory.openSession()) {
-            Query<Double> query = session.createNativeQuery("SELECT SQRT(POWER(c.coordinates_x, 2) + POWER(c.coordinates_y, 2)) " +
-                    "FROM cities c WHERE c.population = (SELECT MAX(population) FROM cities)", Double.class);
-            return query.getSingleResult();
+
+            Query<Long> maxPopQuery = session.createQuery(
+                    "select max(c.population) from City c where c.population is not null",
+                    Long.class
+            );
+            Long maxPopulation = maxPopQuery.uniqueResult();
+            System.out.println("Max population: " + maxPopulation);
+
+            if (maxPopulation == null) {
+                return 0.0;
+            }
+
+            Query<Object[]> query = session.createQuery(
+                    "select c.coordinates.x, c.coordinates.y, c.name, c.population from City c " +
+                            "where c.population = :maxPopulation and c.coordinates is not null order by c.id",
+                    Object[].class
+            );
+            query.setParameter("maxPopulation", maxPopulation);
+            query.setMaxResults(1);
+            List<Object[]> results = query.list();
+
+            if (results.isEmpty()) {
+                return 0.0;
+            }
+
+            Object[] result = results.get(0);
+            if (result[0] == null || result[1] == null) {
+                return 0.0;
+            }
+
+            Double x = ((Number) result[0]).doubleValue();
+            Double y = ((Number) result[1]).doubleValue();
+
+            return Math.sqrt(x * x + y * y);
+
+        } catch (Exception e) {
+            System.err.println("Error in calculateDistanceToTheMostPopulatedCity: " + e.getMessage());
+            return 0.0;
         }
     }
 
-    public Double calculateDistanceToNewestCity(){
+    public Double calculateDistanceToNewestCity() {
         try (Session session = sessionFactory.openSession()) {
-            Query<Double> query = session.createNativeQuery("SELECT SQRT(POWER(c.coordinates_x, 2) + POWER(c.coordinates_y, 2)) " +
-                    "FROM cities c WHERE c.establishmentDate = (SELECT MAX(establishmentDate) FROM cities)", Double.class);
-            return query.getSingleResult();
+            Query<Long> countQuery = session.createQuery("select count(c) from City c", Long.class);
+            Long count = countQuery.uniqueResult();
+
+            if (count == null || count == 0) {
+                System.out.println("No cities found in the database.");
+                return 0.0;
+            }
+
+            Query<java.time.LocalDate> maxDateQuery = session.createQuery(
+                    "select max(c.establishmentDate) from City c where c.establishmentDate is not null ",
+                    java.time.LocalDate.class
+            );
+            java.time.LocalDate maxDate = maxDateQuery.uniqueResult();
+            System.out.println("Max establishment date: " + maxDate);
+
+            Query<Object[]> query = session.createQuery(
+                    "select c.coordinates.x, c.coordinates.y, c.name from City c " +
+                            "where c.establishmentDate = :maxDate and c.coordinates is not null order by c.id",
+                    Object[].class
+            );
+            query.setParameter("maxDate", maxDate);
+            query.setMaxResults(1);
+
+            List<Object[]> results = query.list();
+
+            if (results.isEmpty()) {
+                return 0.0;
+            }
+
+            Object[] result = results.get(0);
+
+            Double x = ((Number) result[0]).doubleValue();
+            Double y = ((Number) result[1]).doubleValue();
+            String cityName = (String) result[2];
+
+            Double distance = Math.sqrt(x * x + y * y);
+            System.out.println("Newest city: " + cityName + " at (" + x + ", " + y + "), distance: " + distance);
+
+            return distance;
+
+        } catch (Exception e) {
+            System.err.println("Error in calculateDistanceToNewestCity: " + e.getMessage());
+            return 0.0;
         }
     }
+
 
 
 }

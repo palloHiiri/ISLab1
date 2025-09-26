@@ -41,14 +41,14 @@ public class CityController {
     @GetMapping("/all")
     public ResponseEntity<Map<String, Object>> getAllCities(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
+            @RequestParam(value = "size", defaultValue = "6") int size) {
 
         List<City> allCities = cityService.getAllCities();
         int totalCities = allCities.size();
         int totalPages = (int) Math.ceil((double) totalCities / size);
 
         if (page < 0) page = 0;
-        if (size <= 0) size = 10;
+        if (size <= 0) size = 6;
 
         int fromIndex = page * size;
         if (fromIndex >= totalCities) {

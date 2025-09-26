@@ -25,10 +25,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // React dev server
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedOriginPatterns("http://localhost:*") // Используем паттерн вместо конкретного порта
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                ;
     }
 
     @Override
@@ -36,6 +37,4 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("/static/");
     }
-
-
 }

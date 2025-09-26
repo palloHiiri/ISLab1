@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import CityList from './components/cityList';
-import axios from 'axios';
-import './App.css';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import CityList from "./components/cityList.jsx";
+import SpecialFunctions from "./components/specialFunctions.jsx";
 
 function App() {
-    return(
+    return (
         <div className="App">
-            <CityList />
+            <Routes>
+                <Route path="/" element={<CityList />} />
+                <Route path="/special-functions" element={<SpecialFunctions />} />
+            </Routes>
         </div>
-    )
+    );
 }
 
 export default App;
