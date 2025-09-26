@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cityService } from '../services/cityService';
-import CityTable from "./cityTable.jsx";
 import CityForm from "./cityForm.jsx";
 import './CityList.css';
 
@@ -20,7 +19,7 @@ const CityList = () => {
     const [searchError, setSearchError] = useState('');
     const [autoRefresh, setAutoRefresh] = useState(true);
 
-    // Отдельные фильтры для каждого столбца
+    // Фильтры для каждого столбца
     const [filters, setFilters] = useState({
         id: '',
         name: '',
@@ -40,7 +39,6 @@ const CityList = () => {
 
     const [sortBy, setSortBy] = useState('id');
     const [sortDirection, setSortDirection] = useState('asc');
-
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage] = useState(5);
 
@@ -57,7 +55,7 @@ const CityList = () => {
         if (autoRefresh) {
             intervalRef.current = setInterval(() => {
                 fetchCities();
-            }, 10000); // Автообновление каждые 10 секунд
+            }, 10000);
         }
 
         return () => {
@@ -103,7 +101,6 @@ const CityList = () => {
         }
     };
 
-    // Обработчик изменения фильтра с задержкой
     const handleFilterChange = (field, value) => {
         setFilters(prev => ({ ...prev, [field]: value }));
         setCurrentPage(0);
@@ -114,7 +111,7 @@ const CityList = () => {
 
         filterTimeoutRef.current = setTimeout(() => {
             fetchCities();
-        }, 800); // Задержка 800мс для избежания лишних запросов
+        }, 800);
     };
 
     const handleSortChange = (field) => {
@@ -226,6 +223,63 @@ const CityList = () => {
         setAutoRefresh(!autoRefresh);
     };
 
+    const getSortIcon = (field) => {
+        if (sortBy !== field) return '↕️';
+        return sortDirection === 'asc' ? '↑' : '↓';
+    };
+
+    const hasActiveFilters = Object.values(filters).some(filter => filter !== '');
+    const activeFiltersCount = Object.values(filters).filter(filter => filter !== '').length;
+
+    const TableHeader = ({ field, label, filterType = 'text', options = [] }) => (
+        <th>
+            <div className="column-header">
+                <div className="column-title">
+                    <span>{label}</span>
+                    <button
+                        onClick={() => handleSortChange(field)}
+                        className={`sort-btn ${sortBy === field ? 'active' : ''}`}
+                    >
+                        {getSortIcon(field)}
+                    </button>
+                </div>
+                <div className="column-filter">
+                    {filterType === 'select' ? (
+                        <select
+                            value={filters[field] || ''}
+                            onChange={(e) => handleFilterChange(field, e.target.value)}
+                            className="filter-input"
+                        >
+                            <option value="">All</option>
+                            {options.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <input
+                            type={filterType}
+                            placeholder={`Filter ${label.toLowerCase()}...`}
+                            value={filters[field] || ''}
+                            onChange={(e) => handleFilterChange(field, e.target.value)}
+                            className="filter-input"
+                        />
+                    )}
+                    {filters[field] && (
+                        <button
+                            onClick={() => clearFilter(field)}
+                            className="clear-filter-btn"
+                            title="Clear filter"
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
+            </div>
+        </th>
+    );
+
     if (loading && (!cities.cities || cities.cities.length === 0)) {
         return (
             <div className="city-list">
@@ -237,352 +291,53 @@ const CityList = () => {
         );
     }
 
-    const getSortIcon = (field) => {
-        if (sortBy !== field) return '↕️';
-        return sortDirection === 'asc' ? '↑' : '↓';
-    };
-
-    const hasActiveFilters = Object.values(filters).some(filter => filter !== '');
-    const activeFiltersCount = Object.values(filters).filter(filter => filter !== '').length;
-
     return (
         <div className="city-list">
             <div className="header">
                 <h1>Cities Management</h1>
 
-                {/* Контролы фильтрации по столбцам */}
-                <div className="filters-section">
-                    <div className="filters-header">
-                        <h3>🔍 Filters by Column</h3>
-                        <div className="filter-actions">
-                            {hasActiveFilters && (
+                <div className="header-controls">
+                    <div className="controls-left">
+
+                        <div className="search-container">
+                            <input
+                                type="number"
+                                placeholder="Enter city ID"
+                                value={searchId}
+                                onChange={(e) => setSearchId(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSearchById()}
+                                className="search-input"
+                            />
+                            <button
+                                onClick={handleSearchById}
+                                disabled={!searchId.trim() || searchLoading}
+                                className="btn-secondary"
+                            >
+                                {searchLoading ? 'Searching...' : 'Search by ID'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="controls-right">
+                        {hasActiveFilters && (
+                            <div className="filter-indicator">
                                 <span className="active-filters-badge">
                                     {activeFiltersCount} active filter{activeFiltersCount > 1 ? 's' : ''}
                                 </span>
-                            )}
-                            <button onClick={clearAllFilters} className="btn-clear-all">
-                                Clear All Filters
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="column-filters">
-                        <div className="filter-row">
-                            <div className="filter-group">
-                                <label>ID</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by ID..."
-                                        value={filters.id}
-                                        onChange={(e) => handleFilterChange('id', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.id && (
-                                        <button onClick={() => clearFilter('id')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
+                                <button onClick={clearAllFilters} className="btn-clear-all">
+                                    Clear All Filters
+                                </button>
                             </div>
+                        )}
 
-                            <div className="filter-group">
-                                <label>Name</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by name..."
-                                        value={filters.name}
-                                        onChange={(e) => handleFilterChange('name', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.name && (
-                                        <button onClick={() => clearFilter('name')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Coordinates X</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by X coordinate..."
-                                        value={filters.coordinatesX}
-                                        onChange={(e) => handleFilterChange('coordinatesX', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.coordinatesX && (
-                                        <button onClick={() => clearFilter('coordinatesX')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Coordinates Y</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by Y coordinate..."
-                                        value={filters.coordinatesY}
-                                        onChange={(e) => handleFilterChange('coordinatesY', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.coordinatesY && (
-                                        <button onClick={() => clearFilter('coordinatesY')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="filter-row">
-                            <div className="filter-group">
-                                <label>Creation Date</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by creation date (YYYY-MM-DD)..."
-                                        value={filters.creationDate}
-                                        onChange={(e) => handleFilterChange('creationDate', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.creationDate && (
-                                        <button onClick={() => clearFilter('creationDate')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Area</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by area..."
-                                        value={filters.area}
-                                        onChange={(e) => handleFilterChange('area', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.area && (
-                                        <button onClick={() => clearFilter('area')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Population</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by population..."
-                                        value={filters.population}
-                                        onChange={(e) => handleFilterChange('population', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.population && (
-                                        <button onClick={() => clearFilter('population')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Establishment Date</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by establishment date..."
-                                        value={filters.establishmentDate}
-                                        onChange={(e) => handleFilterChange('establishmentDate', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.establishmentDate && (
-                                        <button onClick={() => clearFilter('establishmentDate')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="filter-row">
-                            <div className="filter-group">
-                                <label>Capital</label>
-                                <div className="filter-input-container">
-                                    <select
-                                        value={filters.capital}
-                                        onChange={(e) => handleFilterChange('capital', e.target.value)}
-                                        className="column-filter-input"
-                                    >
-                                        <option value="">All</option>
-                                        <option value="true">Yes</option>
-                                        <option value="false">No</option>
-                                    </select>
-                                    {filters.capital && (
-                                        <button onClick={() => clearFilter('capital')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Meters Above Sea Level</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by meters above sea level..."
-                                        value={filters.metersAboveSeaLevel}
-                                        onChange={(e) => handleFilterChange('metersAboveSeaLevel', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.metersAboveSeaLevel && (
-                                        <button onClick={() => clearFilter('metersAboveSeaLevel')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Timezone</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by timezone (-13 to 15)..."
-                                        value={filters.timezone}
-                                        onChange={(e) => handleFilterChange('timezone', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.timezone && (
-                                        <button onClick={() => clearFilter('timezone')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Car Code</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by car code (1-1000)..."
-                                        value={filters.carCode}
-                                        onChange={(e) => handleFilterChange('carCode', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.carCode && (
-                                        <button onClick={() => clearFilter('carCode')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="filter-row">
-                            <div className="filter-group">
-                                <label>Government</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by government..."
-                                        value={filters.government}
-                                        onChange={(e) => handleFilterChange('government', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.government && (
-                                        <button onClick={() => clearFilter('government')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
-                                <label>Governor</label>
-                                <div className="filter-input-container">
-                                    <input
-                                        type="text"
-                                        placeholder="Filter by governor name..."
-                                        value={filters.governor}
-                                        onChange={(e) => handleFilterChange('governor', e.target.value)}
-                                        className="column-filter-input"
-                                    />
-                                    {filters.governor && (
-                                        <button onClick={() => clearFilter('governor')} className="clear-filter-btn">✕</button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Контролы сортировки по всем столбцам */}
-                <div className="sort-section">
-                    <div className="sort-header">
-                        <h3>📊 Sort by Column</h3>
-                        <span className="current-sort">
-                            Currently: <strong>{sortBy}</strong> ({sortDirection})
-                        </span>
-                    </div>
-
-                    <div className="sort-buttons-grid">
-                        {[
-                            { field: 'id', label: 'ID' },
-                            { field: 'name', label: 'Name' },
-                            { field: 'coordinatesX', label: 'Coordinates X' },
-                            { field: 'coordinatesY', label: 'Coordinates Y' },
-                            { field: 'coordinates', label: 'Coordinates (X,Y)' },
-                            { field: 'creationDate', label: 'Creation Date' },
-                            { field: 'area', label: 'Area' },
-                            { field: 'population', label: 'Population' },
-                            { field: 'establishmentDate', label: 'Establishment Date' },
-                            { field: 'capital', label: 'Capital' },
-                            { field: 'metersAboveSeaLevel', label: 'Meters Above Sea Level' },
-                            { field: 'timezone', label: 'Timezone' },
-                            { field: 'carCode', label: 'Car Code' },
-                            { field: 'government', label: 'Government' },
-                            { field: 'governor', label: 'Governor' }
-                        ].map(({ field, label }) => (
-                            <button
-                                key={field}
-                                onClick={() => handleSortChange(field)}
-                                className={`sort-btn ${sortBy === field ? 'active' : ''}`}
-                            >
-                                {label} {getSortIcon(field)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="header-controls">
-                    <div className="refresh-controls">
-                        <button
-                            onClick={toggleAutoRefresh}
-                            className={`btn-toggle ${autoRefresh ? 'active' : ''}`}
-                        >
-                            {autoRefresh ? '🔄 Auto-Refresh ON' : '⏸️ Auto-Refresh OFF'}
+                        <button onClick={handleAddCity} disabled={showForm} className="btn-primary">
+                            Add New City
                         </button>
-                        <button
-                            onClick={handleManualRefresh}
-                            className="btn-secondary"
-                            disabled={loading}
-                        >
-                            {loading ? 'Refreshing...' : '🔄 Manual Refresh'}
+
+                        <button onClick={goToSpecialFunctions} className="btn-special">
+                            📊 Special Functions
                         </button>
                     </div>
-
-                    <div className="search-container">
-                        <input
-                            type="number"
-                            placeholder="Enter city ID"
-                            value={searchId}
-                            onChange={(e) => setSearchId(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearchById()}
-                            className="search-input"
-                        />
-                        <button
-                            onClick={handleSearchById}
-                            disabled={!searchId.trim() || searchLoading}
-                            className="btn-secondary"
-                        >
-                            {searchLoading ? 'Searching...' : 'Search by ID'}
-                        </button>
-                    </div>
-
-                    <button onClick={handleAddCity} disabled={showForm} className="btn-primary">
-                        Add New City
-                    </button>
-
-                    <button onClick={goToSpecialFunctions} className="btn-special">
-                        📊 Special Functions
-                    </button>
                 </div>
             </div>
 
@@ -611,14 +366,73 @@ const CityList = () => {
 
                     {cities.cities && cities.cities.length > 0 ? (
                         <>
-                            <CityTable
-                                cities={cities.cities}
-                                onEdit={handleEditCity}
-                                onDelete={handleDeleteCity}
-                                onSort={handleSortChange}
-                                sortBy={sortBy}
-                                sortDirection={sortDirection}
-                            />
+                            <div className="table-container">
+                                <table className="city-table">
+                                    <thead>
+                                    <tr>
+                                        <TableHeader field="id" label="ID" filterType="number" />
+                                        <TableHeader field="name" label="Name" />
+                                        <TableHeader field="coordinatesX" label="Coord X" filterType="number" />
+                                        <TableHeader field="coordinatesY" label="Coord Y" filterType="number" />
+                                        <TableHeader field="creationDate" label="Creation Date" />
+                                        <TableHeader field="area" label="Area" filterType="number" />
+                                        <TableHeader field="population" label="Population" filterType="number" />
+                                        <TableHeader field="establishmentDate" label="Est. Date" />
+                                        <TableHeader
+                                            field="capital"
+                                            label="Capital"
+                                            filterType="select"
+                                            options={[
+                                                { value: 'true', label: 'Yes' },
+                                                { value: 'false', label: 'No' }
+                                            ]}
+                                        />
+                                        <TableHeader field="metersAboveSeaLevel" label="Meters Above SL" filterType="number" />
+                                        <TableHeader field="timezone" label="Timezone" filterType="number" />
+                                        <TableHeader field="carCode" label="Car Code" filterType="number" />
+                                        <TableHeader field="government" label="Government" />
+                                        <TableHeader field="governor" label="Governor" />
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {cities.cities.map(city => (
+                                        <tr key={city.id}>
+                                            <td>{city.id}</td>
+                                            <td>{city.name}</td>
+                                            <td>{city.coordinates?.x}</td>
+                                            <td>{city.coordinates?.y}</td>
+                                            <td>{city.creationDate ? new Date(city.creationDate).toLocaleDateString() : 'N/A'}</td>
+                                            <td>{city.area}</td>
+                                            <td>{city.population?.toLocaleString()}</td>
+                                            <td>{city.establishmentDate ? new Date(city.establishmentDate).toLocaleDateString() : 'N/A'}</td>
+                                            <td>{city.capital ? 'Yes' : 'No'}</td>
+                                            <td>{city.metersAboveSeaLevel || 'N/A'}</td>
+                                            <td>{city.timezone}</td>
+                                            <td>{city.carCode || 'N/A'}</td>
+                                            <td>{city.government}</td>
+                                            <td>{city.governor?.name || 'N/A'}</td>
+                                            <td className="actions">
+                                                <button
+                                                    onClick={() => handleEditCity(city)}
+                                                    className="btn-edit"
+                                                    title="Edit city"
+                                                >
+                                                    ✏️
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteCity(city.id)}
+                                                    className="btn-delete"
+                                                    title="Delete city"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
 
                             {cities.totalPages > 1 && (
                                 <div className="pagination">
@@ -676,7 +490,6 @@ const CityList = () => {
                 </>
             )}
 
-            {/* Модальное окно поиска */}
             {showSearchModal && (
                 <div className="modal-overlay" onClick={closeSearchModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
