@@ -4,6 +4,7 @@ import com.example.model.City;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -47,34 +48,61 @@ public class CityRepository {
     }
 
     public void update(City city) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = null;
             transaction = session.beginTransaction();
             session.update(city);
             transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            throw e;
-        } finally {
-            session.close();
         }
     }
 
     public void delete(City city) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
 
-        try {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = null;
             transaction = session.beginTransaction();
             session.delete(city);
             transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            throw e;
-        } finally {
-            session.close();
+        }
+    }
+
+    public Double getSumOfTimezones(){
+        try (Session session = sessionFactory.openSession()) {
+            Query<Double> query = session.createQuery("select sum(t.timezone) from City t", Double.class);
+            return query.getSingleResult();
+        }
+    }
+
+    public Double getAverageCarCode() {
+        try (var session = sessionFactory.openSession()) {
+            Query<Double> query = session.createQuery(
+                    "select avg(c.carCode) from City c", Double.class);
+            return query.uniqueResult();
+        }
+    }
+
+    public List<City> getCitiesWithTimezoneLessThan(Integer timezone){
+        try (Session session = sessionFactory.openSession()) {
+            Query<City> query = session.createQuery("from City c where c.timezone > :timezone", City.class);
+            query.setParameter("timezone", timezone);
+            return query.list();
+        }
+    }
+
+    public Double calculateDistanceToTheMostPopulatedCity(){
+        try (Session session = sessionFactory.openSession()) {
+            Query<Double> query = session.createNativeQuery("SELECT SQRT(POWER(c.coordinates_x, 2) + POWER(c.coordinates_y, 2)) " +
+                    "FROM cities c WHERE c.population = (SELECT MAX(population) FROM cities)", Double.class);
+            return query.getSingleResult();
+        }
+    }
+
+    public Double calculateDistanceToNewestCity(){
+        try (Session session = sessionFactory.openSession()) {
+            Query<Double> query = session.createNativeQuery("SELECT SQRT(POWER(c.coordinates_x, 2) + POWER(c.coordinates_y, 2)) " +
+                    "FROM cities c WHERE c.establishmentDate = (SELECT MAX(establishmentDate) FROM cities)", Double.class);
+            return query.getSingleResult();
         }
     }
 

@@ -45,5 +45,30 @@ public class CityService {
         cityRepository.delete(city);
     }
 
+    @Transactional
+    public Double getAverageCarCode(){
+        return cityRepository.getAverageCarCode();
+    }
+
+    @Transactional
+    public Double getSumOfTimezones(){
+        return cityRepository.getSumOfTimezones();
+    }
+
+    @Transactional
+    public List<City> getCitiesWithTimezoneLessThan(int timezone){
+        return cityRepository.getCitiesWithTimezoneLessThan(timezone);
+    }
+
+    @Transactional
+    public Double calculateDistanceToTheMostPopulatedCity(){
+        return cityRepository.calculateDistanceToTheMostPopulatedCity();
+    }
+
+    @Transactional
+    public Double calculateDistanceToNewestCity(){
+        return cityRepository.calculateDistanceToNewestCity();
+    }
+
 
 }
