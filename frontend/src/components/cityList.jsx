@@ -25,7 +25,6 @@ const CityList = () => {
 
     const intervalRef = useRef(null);
 
-    // Функция для перехода на страницу спец функций
     const goToSpecialFunctions = () => {
         navigate('/special-functions');
     };
@@ -174,9 +173,8 @@ const CityList = () => {
                         Add New City
                     </button>
 
-                    {/* Кнопка с React Router навигацией */}
                     <button onClick={goToSpecialFunctions} className="btn-special">
-                        📊 Special Functions
+                        Special Functions
                     </button>
                 </div>
             </div>
@@ -250,7 +248,6 @@ const CityList = () => {
                 </>
             )}
 
-            {/* Модальное окно поиска */}
             {showSearchModal && (
                 <div className="modal-overlay" onClick={closeSearchModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>

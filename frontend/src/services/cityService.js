@@ -21,7 +21,6 @@ class CityService {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Для DELETE без контента
         if (response.status === 204) {
             return null;
         }
@@ -57,7 +56,6 @@ class CityService {
         });
     }
 
-    // Специальные операции
     async getSumOfTimezones() {
         return this.request('/sum-of-timezones');
     }
