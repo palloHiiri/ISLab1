@@ -1,0 +1,396 @@
+/* Modal Notification Styles */
+.notification-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: overlayFadeIn 0.3s ease-out;
+}
+
+.notification-modal-overlay-exit {
+    animation: overlayFadeOut 0.3s ease-out;
+}
+
+.notification-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid #e5e7eb;
+}
+
+.notification-modal-exit {
+    animation: modalSlideOut 0.3s ease-out;
+}
+
+.notification-modal-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+}
+
+.notification-modal-icon {
+    font-size: 24px;
+    margin-right: 12px;
+}
+
+.notification-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    flex: 1;
+}
+
+.notification-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.notification-modal-close:hover {
+    color: #6b7280;
+    background-color: #f3f4f6;
+}
+
+.notification-modal-content {
+    padding: 16px 24px 24px 24px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.notification-modal-content p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.notification-modal-actions {
+    padding: 16px 24px 20px 24px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.notification-modal-button {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.notification-modal-progress {
+    height: 4px;
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
+
+.notification-modal-progress-bar {
+    height: 100%;
+    width: 100%;
+    transform-origin: left;
+    animation: progressShrink linear forwards;
+}
+
+/* Error styles */
+.notification-error .notification-modal-header {
+    background-color: #fef2f2;
+    border-bottom-color: #fecaca;
+}
+
+.notification-error .notification-modal-title {
+    color: #dc2626;
+}
+
+.notification-error .notification-modal-button {
+    background-color: #dc2626;
+    color: white;
+}
+
+.notification-error .notification-modal-button:hover {
+    background-color: #b91c1c;
+}
+
+.notification-error .notification-modal-progress-bar {
+    background-color: #dc2626;
+}
+
+/* Success styles */
+.notification-success .notification-modal-header {
+    background-color: #f0fdf4;
+    border-bottom-color: #bbf7d0;
+}
+
+.notification-success .notification-modal-title {
+    color: #16a34a;
+}
+
+.notification-success .notification-modal-button {
+    background-color: #16a34a;
+    color: white;
+}
+
+.notification-success .notification-modal-button:hover {
+    background-color: #15803d;
+}
+
+.notification-success .notification-modal-progress-bar {
+    background-color: #16a34a;
+}
+
+/* Warning styles */
+.notification-warning .notification-modal-header {
+    background-color: #fffbeb;
+    border-bottom-color: #fed7aa;
+}
+
+.notification-warning .notification-modal-title {
+    color: #d97706;
+}
+
+.notification-warning .notification-modal-button {
+    background-color: #d97706;
+    color: white;
+}
+
+.notification-warning .notification-modal-button:hover {
+    background-color: #b45309;
+}
+
+.notification-warning .notification-modal-progress-bar {
+    background-color: #d97706;
+}
+
+/* Info styles */
+.notification-info .notification-modal-header {
+    background-color: #eff6ff;
+    border-bottom-color: #bfdbfe;
+}
+
+.notification-info .notification-modal-title {
+    color: #2563eb;
+}
+
+.notification-info .notification-modal-button {
+    background-color: #2563eb;
+    color: white;
+}
+
+.notification-info .notification-modal-button:hover {
+    background-color: #1d4ed8;
+}
+
+.notification-info .notification-modal-progress-bar {
+    background-color: #2563eb;
+}
+
+/* Toast Notification Styles (fallback) */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    animation: toastSlideIn 0.3s ease-out;
+    overflow: hidden;
+}
+
+.notification-toast-exit {
+    animation: toastSlideOut 0.3s ease-out;
+}
+
+.notification-toast-content {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+}
+
+.notification-toast-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.notification-toast-message {
+    flex: 1;
+    color: #374151;
+}
+
+.notification-toast-message p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notification-toast-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    transition: color 0.2s ease;
+}
+
+.notification-toast-close:hover {
+    color: #6b7280;
+}
+
+.notification-toast-progress {
+    height: 3px;
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
+
+.notification-toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    transform-origin: left;
+    animation: progressShrink linear forwards;
+}
+
+/* Toast type styles */
+.notification-toast.notification-error {
+    border-left: 4px solid #dc2626;
+}
+
+.notification-toast.notification-error .notification-toast-progress-bar {
+    background-color: #dc2626;
+}
+
+.notification-toast.notification-success {
+    border-left: 4px solid #16a34a;
+}
+
+.notification-toast.notification-success .notification-toast-progress-bar {
+    background-color: #16a34a;
+}
+
+.notification-toast.notification-warning {
+    border-left: 4px solid #d97706;
+}
+
+.notification-toast.notification-warning .notification-toast-progress-bar {
+    background-color: #d97706;
+}
+
+.notification-toast.notification-info {
+    border-left: 4px solid #2563eb;
+}
+
+.notification-toast.notification-info .notification-toast-progress-bar {
+    background-color: #2563eb;
+}
+
+/* Animations */
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes overlayFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.95);
+    }
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+@keyframes progressShrink {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .notification-modal {
+        width: 95%;
+        margin: 20px;
+    }
+
+    .notification-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
