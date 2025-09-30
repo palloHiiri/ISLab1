@@ -1,6 +1,8 @@
 package com.example.repository;
 
 import com.example.model.City;
+import com.example.model.Coordinates;
+import com.example.model.Human;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -30,6 +32,49 @@ public class CityRepository {
             return session.get(City.class, id);
         }
     }
+
+    public void deleteCascade(City city) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            if (city.getCoordinates() != null) {
+                Query<?> coordQuery = session.createQuery(
+                        "delete from City c where c.coordinates.x = :x and c.coordinates.y = :y"
+                );
+                coordQuery.setParameter("x", city.getCoordinates().getX());
+                coordQuery.setParameter("y", city.getCoordinates().getY());
+                int deletedByCoords = coordQuery.executeUpdate();
+                System.out.println("Deleted " + deletedByCoords + " cities by coordinates");
+            }
+
+            if (city.getGovernor() != null && city.getGovernor().getName() != null) {
+                Query<?> govQuery = session.createQuery(
+                        "delete from City c where c.governor.name = :govName"
+                );
+                govQuery.setParameter("govName", city.getGovernor().getName());
+                int deletedByGov = govQuery.executeUpdate();
+                System.out.println("Deleted " + deletedByGov + " cities by governor");
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            System.err.println("Error in cascade delete: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public List<Human> findAllGovernors() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("SELECT DISTINCT c.governor FROM City c WHERE c.governor IS NOT NULL", Human.class).list();
+        }
+    }
+
+    public List<Coordinates> findAllCoordinates() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("SELECT DISTINCT c.coordinates FROM City c WHERE c.coordinates IS NOT NULL", Coordinates.class).list();
+        }
+    }
+
 
     public Long save(City city) {
         Session session = sessionFactory.openSession();

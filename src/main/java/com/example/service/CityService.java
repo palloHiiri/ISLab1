@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.model.City;
+import com.example.model.Coordinates;
+import com.example.model.Human;
 import com.example.repository.CityRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +61,21 @@ public class CityService {
     @Transactional(readOnly = true)
     public Double calculateDistanceToTheMostPopulatedCity(){
         return cityRepository.calculateDistanceToTheMostPopulatedCity();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Human> getAllGovernors() {
+        return cityRepository.findAllGovernors();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Coordinates> getAllCoordinates() {
+        return cityRepository.findAllCoordinates();
+    }
+
+    @Transactional
+    public void deleteCityCascade(City city) {
+        cityRepository.deleteCascade(city);
     }
 
     @Transactional(readOnly = true)

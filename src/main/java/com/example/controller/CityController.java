@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.model.City;
+import com.example.model.Coordinates;
+import com.example.model.Human;
 import com.example.service.CityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -240,20 +242,21 @@ public class CityController {
 
             City city = cityService.getCity(id);
             if (city != null) {
-                cityService.deleteCity(city);
+                // Используем каскадное удаление вместо обычного
+                cityService.deleteCityCascade(city);
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
-                response.put("message", "City deleted successfully");
+                response.put("message", "City and related cities deleted successfully");
                 return ResponseEntity.ok(response);
             } else {
                 return createErrorResponse("City with ID " + id + " not found", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
             System.err.println("Error deleting city: " + e.getMessage());
-            e.printStackTrace();
             return createErrorResponse("Failed to delete city: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping("/sum-of-timezones")
     public ResponseEntity<?> getSumOfTimezones() {
@@ -265,6 +268,19 @@ public class CityController {
             return createErrorResponse("Failed to calculate sum of timezones: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/governors")
+    public ResponseEntity<List<Human>> getAllGovernors() {
+        List<Human> governors = cityService.getAllGovernors();
+        return ResponseEntity.ok(governors);
+    }
+
+    @GetMapping("/coordinates")
+    public ResponseEntity<List<Coordinates>> getAllCoordinates() {
+        List<Coordinates> coordinates = cityService.getAllCoordinates();
+        return ResponseEntity.ok(coordinates);
+    }
+
 
     @GetMapping("/average-car-code")
     public ResponseEntity<?> getAverageCarCode() {

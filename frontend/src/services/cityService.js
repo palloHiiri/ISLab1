@@ -224,6 +224,23 @@ class CityService {
         }
     }
 
+    async getGovernors() {
+        try {
+            return await this.request('/governors');
+        } catch (error) {
+            throw new Error(`Failed to fetch governors: ${error.message}`);
+        }
+    }
+
+    async getCoordinates() {
+        try {
+            return await this.request('/coordinates');
+        } catch (error) {
+            throw new Error(`Failed to fetch coordinates: ${error.message}`);
+        }
+    }
+
+
     validateCityData(city) {
         const errors = [];
 
