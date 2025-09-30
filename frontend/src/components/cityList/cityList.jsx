@@ -6,6 +6,7 @@ import CityTableWithPagination from "../сityTableWithPagination/CityTableWithPa
 import { useNotification } from '../errorNotification/errorNotification.jsx';
 import CitySearchModal from "../сitySearchModal/сitySearchModal.jsx";
 import './CityList.css';
+import {websocketService} from "../../services/websocketService.js";
 
 const CityList = () => {
     const navigate = useNavigate();
@@ -46,21 +47,44 @@ const CityList = () => {
     };
 
     useEffect(() => {
-        fetchCities();
+        fetchCities()
+        websocketService.connect();
 
-        intervalRef.current = setInterval(() => {
-            fetchCities(true); // silent refresh
-        }, 3000);
+        const handleCityAdded = (city) => {
+            console.log('Город добавлен:', city);
+            fetchCities(true);
+        };
+
+        const handleCityUpdated = (city) => {
+            console.log('Город обновлен:', city);
+            fetchCities(true);
+        };
+
+        const handleCitiesDeletedCascade = (city) => {
+            console.log('Каскадное удаление городов:', city);
+            fetchCities(true);
+        };
+
+        // Подписка на события
+        websocketService.addListener('CITY_ADDED', handleCityAdded);
+        websocketService.addListener('CITY_UPDATED', handleCityUpdated);
+        websocketService.addListener('CITY_DELETED', handleCitiesDeletedCascade);
 
         return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            // Отписка от событий
+            websocketService.removeListener('CITY_ADDED', handleCityAdded);
+            websocketService.removeListener('CITY_UPDATED', handleCityUpdated);
+            websocketService.removeListener('CITY_DELETED', handleCitiesDeletedCascade);
+
+            websocketService.disconnect();
+
+            // Убираем интервал, так как теперь используем WebSocket
             if (filterTimeoutRef.current) {
                 clearTimeout(filterTimeoutRef.current);
             }
         };
-    }, [currentPage, filters, sortBy, sortDirection]);
+    },[])
+
 
     const fetchCities = async (silent = false) => {
         try {

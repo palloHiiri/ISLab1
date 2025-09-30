@@ -4,6 +4,7 @@ import com.example.model.City;
 import com.example.model.Coordinates;
 import com.example.model.Human;
 import com.example.repository.CityRepository;
+import com.example.websocket.CityWebSocketHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +14,19 @@ import java.util.Map;
 @Service
 public class CityService {
     private final CityRepository cityRepository;
+    private final CityWebSocketHandler webSocketHandler;
 
-    public CityService(CityRepository cityRepository) {
+    public CityService(CityRepository cityRepository, CityWebSocketHandler webSocketHandler) {
+        this.webSocketHandler = webSocketHandler;
         this.cityRepository = cityRepository;
+
     }
 
     @Transactional
     public Long addCity(City city) {
-        return cityRepository.save(city);
+        Long id = cityRepository.save(city);
+        webSocketHandler.broadcastUpdate("CITY_ADDED", city);
+        return id;
     }
 
     @Transactional(readOnly = true)
@@ -36,6 +42,7 @@ public class CityService {
     @Transactional
     public void updateCity(City city) {
         cityRepository.update(city);
+        webSocketHandler.broadcastUpdate("CITY_UPDATED", city);
     }
 
     @Transactional
@@ -76,6 +83,7 @@ public class CityService {
     @Transactional
     public void deleteCityCascade(City city) {
         cityRepository.deleteCascade(city);
+        webSocketHandler.broadcastUpdate("CITY_DELETED", city);
     }
 
     @Transactional(readOnly = true)
