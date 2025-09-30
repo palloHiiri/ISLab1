@@ -3,10 +3,10 @@ import './ErrorNotification.css';
 
 const ErrorNotification = ({
                                message,
-                               type = 'error', // 'error', 'success', 'warning', 'info'
+                               type = 'error',
                                onClose,
                                duration = 5000,
-                               isModal = true // Show as modal by default
+                               isModal = true
                            }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
@@ -125,7 +125,6 @@ const ErrorNotification = ({
         );
     }
 
-    // Fallback to toast style if isModal is false
     return (
         <div className={`notification-toast ${getTypeClass()} ${isExiting ? 'notification-toast-exit' : ''}`}>
             <div className="notification-toast-content">
@@ -138,6 +137,7 @@ const ErrorNotification = ({
                 <button
                     onClick={handleClose}
                     className="notification-toast-close"
+                    // onKeyPress={(e) => e.key === 'Enter' && handleClose()}
                 >
                     ×
                 </button>

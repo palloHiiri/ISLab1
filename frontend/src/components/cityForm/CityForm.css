@@ -1,0 +1,145 @@
+/* CityFormModal.css */
+
+.city-form-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.city-form-modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.city-form-modal-header {
+    padding: 20px 24px;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.city-form-modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.city-form-modal-tabs {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #f1f5f9;
+}
+
+.city-form-modal-tab {
+    padding: 12px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #64748b;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.city-form-modal-tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    background-color: white;
+}
+
+.city-form-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.city-form-modal-section {
+    display: none;
+}
+
+.city-form-modal-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.city-form-modal-footer {
+    padding: 16px 24px;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Стили для формы — можно оставить как есть или адаптировать */
+.city-form-modal-body .form-group {
+    margin-bottom: 16px;
+}
+
+.city-form-modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.city-form-modal-body input,
+.city-form-modal-body select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.city-form-modal-body input:focus,
+.city-form-modal-body select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.city-form-modal-body .text-red-500 {
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.city-form-modal-body .grid {
+    display: grid;
+    gap: 16px;
+}
+
+.city-form-modal-body .grid-cols-1 { grid-template-columns: 1fr; }
+.city-form-modal-body .grid-cols-2 { grid-template-columns: 1fr 1fr; }
+.city-form-modal-body .grid-cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.city-form-modal-body .grid-cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .city-form-modal-body .grid-cols-2,
+    .city-form-modal-body .grid-cols-3,
+    .city-form-modal-body .grid-cols-4 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -198,9 +198,9 @@ class CityService {
                 throw new Error('Timezone value is required');
             }
 
-            if (timezone < -13 || timezone > 15) {
-                throw new Error('Timezone must be between -13 and 15');
-            }
+            // if (timezone < -13 || timezone > 15) {
+            //     throw new Error('Timezone must be between -13 and 15');
+            // }
 
             return await this.request(`/timezone-less-than/${timezone}`);
         } catch (error) {

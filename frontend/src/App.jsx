@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import CityList from "./components/cityList.jsx";
-import SpecialFunctions from "./components/specialFunctions.jsx";
+import CityList from "./components/cityList/cityList.jsx";
+import SpecialFunctions from "./components/specialFunctions/specialFunctions.jsx";
 
 function App() {
     return (
