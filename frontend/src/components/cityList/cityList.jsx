@@ -6,7 +6,6 @@ import CityTableWithPagination from "../сityTableWithPagination/CityTableWithPa
 import { useNotification } from '../errorNotification/errorNotification.jsx';
 import CitySearchModal from "../сitySearchModal/сitySearchModal.jsx";
 import './CityList.css';
-import {websocketService} from "../../services/websocketService.js";
 
 const CityList = () => {
     const navigate = useNavigate();
@@ -39,52 +38,57 @@ const CityList = () => {
     const [sortDirection, setSortDirection] = useState('asc');
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage] = useState(5);
-    const intervalRef = useRef(null);
+    const ws = useRef(null);
     const filterTimeoutRef = useRef(null);
 
     const goToSpecialFunctions = () => {
         navigate('/special-functions');
     };
 
+    // WebSocket соединение
     useEffect(() => {
-        fetchCities()
-        websocketService.connect();
+        fetchCities();
 
-        const handleCityAdded = (city) => {
-            console.log('Город добавлен:', city);
-            fetchCities(true);
+        // Создаем WebSocket соединение
+        ws.current = new WebSocket(`ws://localhost:8080/ws/cities`);
+
+        ws.current.onopen = () => {
+            console.log('WebSocket connected');
         };
 
-        const handleCityUpdated = (city) => {
-            console.log('Город обновлен:', city);
-            fetchCities(true);
+        ws.current.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message received:', data);
+
+                if (data.type === 'CITY_ADDED' || data.type === 'CITY_UPDATED' || data.type === 'CITY_DELETED') {
+                    console.log('WebSocket event detected, fetching cities...');
+                    fetchCities();
+                }
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
         };
 
-        const handleCitiesDeletedCascade = (city) => {
-            console.log('Каскадное удаление городов:', city);
-            fetchCities(true);
+        ws.current.onerror = (error) => {
+            console.error('WebSocket error:', error);
         };
 
-        // Подписка на события
-        websocketService.addListener('CITY_ADDED', handleCityAdded);
-        websocketService.addListener('CITY_UPDATED', handleCityUpdated);
-        websocketService.addListener('CITY_DELETED', handleCitiesDeletedCascade);
+        ws.current.onclose = (event) => {
+            console.log('WebSocket disconnected:', event.code, event.reason);
+        };
 
+        // Очистка при размонтировании компонента
         return () => {
-            // Отписка от событий
-            websocketService.removeListener('CITY_ADDED', handleCityAdded);
-            websocketService.removeListener('CITY_UPDATED', handleCityUpdated);
-            websocketService.removeListener('CITY_DELETED', handleCitiesDeletedCascade);
+            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                ws.current.close(1000, 'Component unmounting');
+            }
 
-            websocketService.disconnect();
-
-            // Убираем интервал, так как теперь используем WebSocket
             if (filterTimeoutRef.current) {
                 clearTimeout(filterTimeoutRef.current);
             }
         };
-    },[])
-
+    }, []); // Пустой массив зависимостей - выполняется только при монтировании
 
     const fetchCities = async (silent = false) => {
         try {
@@ -108,6 +112,11 @@ const CityList = () => {
             setLoading(false);
         }
     };
+
+    // Обновляем данные при изменении пагинации, фильтров или сортировки
+    useEffect(() => {
+        fetchCities();
+    }, [currentPage, sortBy, sortDirection]); // Добавляем зависимости
 
     const handleFilterChange = (field, value) => {
         setFilters(prev => ({ ...prev, [field]: value }));
@@ -242,7 +251,6 @@ const CityList = () => {
                                     placeholder="Enter city ID"
                                     value={searchId}
                                     onChange={(e) => setSearchId(e.target.value)}
-                                    // onKeyPress={(e) => e.key === 'Enter' && handleSearchById()}
                                     className=""
                                 />
                                 <button
