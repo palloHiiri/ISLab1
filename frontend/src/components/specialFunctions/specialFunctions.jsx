@@ -4,7 +4,7 @@ import { useNotification } from '../errorNotification/errorNotification.jsx';
 import './specialFunctions.css';
 
 const SpecialFunctions = () => {
-    const { showError, NotificationComponent } = useNotification();
+    const {showError, NotificationComponent} = useNotification();
 
     const [results, setResults] = useState({});
     const [timezoneInput, setTimezoneInput] = useState('');
@@ -12,7 +12,7 @@ const SpecialFunctions = () => {
 
     const executeFunction = async (functionName, inputValue = null) => {
         try {
-            setLoadingFunctions(prev => ({ ...prev, [functionName]: true }));
+            setLoadingFunctions(prev => ({...prev, [functionName]: true}));
 
             let result;
             let successMessage = '';
@@ -21,13 +21,13 @@ const SpecialFunctions = () => {
                 case 'sumTimezones':
                     result = await cityService.getSumOfTimezones();
                     successMessage = `Sum of timezones calculated: ${result}`;
-                    setResults(prev => ({ ...prev, sumTimezones: result }));
+                    setResults(prev => ({...prev, sumTimezones: result}));
                     break;
 
                 case 'averageCarCode':
                     result = await cityService.getAverageCarCode();
                     successMessage = `Average car code calculated: ${result?.toFixed(2)}`;
-                    setResults(prev => ({ ...prev, averageCarCode: result }));
+                    setResults(prev => ({...prev, averageCarCode: result}));
                     break;
 
                 case 'citiesWithTimezoneLess':
@@ -44,19 +44,19 @@ const SpecialFunctions = () => {
 
                     result = await cityService.getCitiesWithTimezoneLessThan(timezoneValue);
                     successMessage = `Found ${result.length} cities with timezone greater than ${timezoneValue}`;
-                    setResults(prev => ({ ...prev, citiesWithTimezoneLess: result }));
+                    setResults(prev => ({...prev, citiesWithTimezoneLess: result}));
                     break;
 
                 case 'distanceToMostPopulated':
                     result = await cityService.getDistanceToMostPopulated();
                     successMessage = `Distance to most populated city: ${result?.toFixed(2)} units`;
-                    setResults(prev => ({ ...prev, distanceToMostPopulated: result }));
+                    setResults(prev => ({...prev, distanceToMostPopulated: result}));
                     break;
 
                 case 'distanceToNewest':
                     result = await cityService.getDistanceToNearest();
                     successMessage = `Distance to newest city: ${result?.toFixed(2)} units`;
-                    setResults(prev => ({ ...prev, distanceToNewest: result }));
+                    setResults(prev => ({...prev, distanceToNewest: result}));
                     break;
 
                 default:
@@ -70,7 +70,7 @@ const SpecialFunctions = () => {
             console.error('Function execution error:', error);
             showError(error.message || `Failed to execute ${functionName}`);
         } finally {
-            setLoadingFunctions(prev => ({ ...prev, [functionName]: false }));
+            setLoadingFunctions(prev => ({...prev, [functionName]: false}));
         }
     };
 
@@ -88,15 +88,15 @@ const SpecialFunctions = () => {
         setTimezoneInput(value);
 
         if (results.citiesWithTimezoneLess) {
-            setResults(prev => ({ ...prev, citiesWithTimezoneLess: undefined }));
+            setResults(prev => ({...prev, citiesWithTimezoneLess: undefined}));
         }
     };
 
-    const FunctionCard = ({ title, description, onExecute, isLoading, result, children }) => (
-        <div className="">
+    const FunctionCard = ({title, description, onExecute, isLoading, result, children}) => (
+        <div className="function-card">
             <div className="function-header">
-                <h3 className="">{title}</h3>
-                <p className="">{description}</p>
+                <h3>{title}</h3>
+                <p>{description}</p>
             </div>
 
             <div className="function-actions">
@@ -104,7 +104,7 @@ const SpecialFunctions = () => {
                 <button
                     onClick={onExecute}
                     disabled={isLoading}
-                    className={""}
+                    className="function-actions button"
                 >
                     Execute
                 </button>
@@ -113,27 +113,27 @@ const SpecialFunctions = () => {
             {result !== undefined && (
                 <div className="result">
                     {typeof result === 'number' ? (
-                        <p className="">
+                        <p className="result-number">
                             <strong>Result:</strong> {result.toFixed(2)}
                         </p>
                     ) : Array.isArray(result) ? (
-                        <div className="">
-                            <p className="">Found {result.length} cities:</p>
+                        <div>
+                            <p className="result-list-header">Found {result.length} cities:</p>
                             {result.length > 0 ? (
-                                <div className="">
+                                <div className="cities-list">
                                     {result.map((city, index) => (
-                                        <div key={index} className="">
-                                            <span className="">{city.name}</span>
-                                            <span className="">Timezone: {city.timezone}</span>
+                                        <div key={index} className="city-item">
+                                            <span className="city-name">{city.name}</span>
+                                            <span className="city-timezone">Timezone: {city.timezone}</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="">No cities match the criteria</p>
+                                <p className="no-cities">No cities match the criteria</p>
                             )}
                         </div>
                     ) : (
-                        <p className="">
+                        <p className="result-value">
                             <strong>Result:</strong> {result}
                         </p>
                     )}
@@ -144,21 +144,21 @@ const SpecialFunctions = () => {
 
     return (
         <>
-            <NotificationComponent />
+            <NotificationComponent/>
 
             <div className="special-functions">
                 <div className="header">
-                    <h1 className="">Special City Functions</h1>
+                    <h1>Special City Functions</h1>
                     <div className="header-controls">
                         <button
                             onClick={goBackToCities}
-                            className=""
+                            className="header-controls button"
                         >
                             ← Back to Cities
                         </button>
                         <button
                             onClick={clearResults}
-                            className=""
+                            className="header-controls button"
                         >
                             Clear Results
                         </button>
@@ -189,16 +189,15 @@ const SpecialFunctions = () => {
                         isLoading={loadingFunctions.citiesWithTimezoneLess}
                         result={results.citiesWithTimezoneLess}
                     >
-                        <div className="">
+                        <div className="input-group">
                             <input
                                 type="number"
                                 placeholder="Enter timezone "
                                 value={timezoneInput}
                                 onChange={handleTimezoneInputChange}
-                                className=""
                             />
                             {timezoneInput && (isNaN(timezoneInput) || timezoneInput < -13 || timezoneInput > 15) && (
-                                <p className="">Please enter a valid timezone between -13 and 15</p>
+                                <p className="input-error">Please enter a valid timezone between -13 and 15</p>
                             )}
                         </div>
                     </FunctionCard>
