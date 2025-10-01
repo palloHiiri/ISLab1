@@ -1,4 +1,5 @@
 import React from 'react';
+import './cityTable.css';
 
 const TableHeader = ({ field, label, filterType = 'text', options = [], filters, sortBy, sortDirection, onSortChange, onFilterChange, onClearFilter }) => {
 
@@ -8,10 +9,10 @@ const TableHeader = ({ field, label, filterType = 'text', options = [], filters,
     };
 
     return (
-        <th className="">
+        <th className="table-header">
             <div className="column-header">
-                <div className="">
-                    <span className="">{label}</span>
+                <div className="header-content">
+                    <span className="header-label">{label}</span>
                     <button
                         onClick={() => onSortChange(field)}
                         className="sort-btn"
@@ -25,7 +26,7 @@ const TableHeader = ({ field, label, filterType = 'text', options = [], filters,
                         <select
                             value={filters[field] || ''}
                             onChange={(e) => onFilterChange(field, e.target.value)}
-                            className=""
+                            className="filter-select"
                         >
                             <option value="">All</option>
                             {options.map(option => (
@@ -40,13 +41,13 @@ const TableHeader = ({ field, label, filterType = 'text', options = [], filters,
                             placeholder={`Filter ${label.toLowerCase()}...`}
                             value={filters[field] || ''}
                             onChange={(e) => onFilterChange(field, e.target.value)}
-                            className=""
+                            className="filter-input"
                         />
                     )}
                     {filters[field] && (
                         <button
                             onClick={() => onClearFilter(field)}
-                            className=""
+                            className="clear-filter-btn"
                             title="Clear filter"
                         >
                             ✕
@@ -72,212 +73,216 @@ const CityTable = ({
 
     return (
         <div className="table-container">
-            <table className="">
-                <thead className="">
-                <tr>
-                    <TableHeader
-                        field="id"
-                        label="ID"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="name"
-                        label="Name"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="coordinatesX"
-                        label="Coord X"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="coordinatesY"
-                        label="Coord Y"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="creationDate"
-                        label="Creation Date"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="area"
-                        label="Area"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="population"
-                        label="Population"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="establishmentDate"
-                        label="Est. Date"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="capital"
-                        label="Capital"
-                        filterType="select"
-                        options={[
-                            { value: 'true', label: 'Yes' },
-                            { value: 'false', label: 'No' }
-                        ]}
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="metersAboveSeaLevel"
-                        label="Meters Above SL"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="timezone"
-                        label="Timezone"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="carCode"
-                        label="Car Code"
-                        filterType="number"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="government"
-                        label="Government"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <TableHeader
-                        field="governor"
-                        label="Governor"
-                        filters={filters}
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        onSortChange={onSortChange}
-                        onFilterChange={onFilterChange}
-                        onClearFilter={onClearFilter}
-                    />
-                    <th className="">Actions</th>
-                </tr>
-                </thead>
-                <tbody className="">
-                {cities.map(city => (
-                    <tr key={city.id} className="">
-                        <td className="">{city.id}</td>
-                        <td className="">{city.name}</td>
-                        <td className="">{city.coordinates?.x}</td>
-                        <td className="">{city.coordinates?.y}</td>
-                        <td className="">
-                            {city.creationDate ? new Date(city.creationDate).toLocaleDateString() : 'N/A'}
-                        </td>
-                        <td className="">{city.area}</td>
-                        <td className="">{city.population?.toLocaleString()}</td>
-                        <td className="">
-                            {city.establishmentDate ? new Date(city.establishmentDate).toLocaleDateString() : 'N/A'}
-                        </td>
-                        <td className="">
-                            <span className="">
-                                {city.capital ? 'Yes' : 'No'}
-                            </span>
-                        </td>
-                        <td className="">{city.metersAboveSeaLevel || 'N/A'}</td>
-                        <td className="">{city.timezone}</td>
-                        <td className="">{city.carCode || 'N/A'}</td>
-                        <td className="">{city.government}</td>
-                        <td className="">{city.governor?.name || 'N/A'}</td>
-                        <td className="">
-                            <div className="">
-                                <button
-                                    onClick={() => onEdit(city)}
-                                    className=""
-                                    title="Edit city"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => onDelete(city.id)}
-                                    className=""
-                                    title="Delete city"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </td>
+            <div className="table-wrapper">
+                <table className="city-table">
+                    <thead className="table-head">
+                    <tr>
+                        <TableHeader
+                            field="id"
+                            label="ID"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="name"
+                            label="Name"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="coordinatesX"
+                            label="Coord X"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="coordinatesY"
+                            label="Coord Y"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="creationDate"
+                            label="Creation Date"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="area"
+                            label="Area"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="population"
+                            label="Population"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="establishmentDate"
+                            label="Est. Date"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="capital"
+                            label="Capital"
+                            filterType="select"
+                            options={[
+                                { value: 'true', label: 'Yes' },
+                                { value: 'false', label: 'No' }
+                            ]}
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="metersAboveSeaLevel"
+                            label="Meters Above SL"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="timezone"
+                            label="Timezone"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="carCode"
+                            label="Car Code"
+                            filterType="number"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="government"
+                            label="Government"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <TableHeader
+                            field="governor"
+                            label="Governor"
+                            filters={filters}
+                            sortBy={sortBy}
+                            sortDirection={sortDirection}
+                            onSortChange={onSortChange}
+                            onFilterChange={onFilterChange}
+                            onClearFilter={onClearFilter}
+                        />
+                        <th className="table-header actions-header">Actions</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="table-body">
+                    {cities.map((city, index) => (
+                        <tr key={city.id} className="table-row" style={{'--row-index': index}}>
+                            <td className="table-cell id-cell">{city.id}</td>
+                            <td className="table-cell name-cell">{city.name}</td>
+                            <td className="table-cell coord-cell">{city.coordinates?.x}</td>
+                            <td className="table-cell coord-cell">{city.coordinates?.y}</td>
+                            <td className="table-cell date-cell">
+                                {city.creationDate ? new Date(city.creationDate).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="table-cell number-cell">{city.area}</td>
+                            <td className="table-cell number-cell">{city.population?.toLocaleString()}</td>
+                            <td className="table-cell date-cell">
+                                {city.establishmentDate ? new Date(city.establishmentDate).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="table-cell capital-cell">
+                                <span className={`capital-badge ${city.capital ? 'capital-yes' : 'capital-no'}`}>
+                                    {city.capital ? 'Yes' : 'No'}
+                                </span>
+                            </td>
+                            <td className="table-cell number-cell">{city.metersAboveSeaLevel || 'N/A'}</td>
+                            <td className="table-cell number-cell">{city.timezone}</td>
+                            <td className="table-cell number-cell">{city.carCode || 'N/A'}</td>
+                            <td className="table-cell text-cell">{city.government}</td>
+                            <td className="table-cell text-cell">{city.governor?.name || 'N/A'}</td>
+                            <td className="table-cell actions-cell">
+                                <div className="action-buttons">
+                                    <button
+                                        onClick={() => onEdit(city)}
+                                        className="action-btn edit-btn"
+                                        title="Edit city"
+                                    >
+                                        <span>✏️</span>
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(city.id)}
+                                        className="action-btn delete-btn"
+                                        title="Delete city"
+                                    >
+                                        <span>🗑️</span>
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

@@ -237,7 +237,7 @@ const CityList = () => {
             <NotificationComponent />
             <div className="city-list">
                 <div className="header ">
-                    <h1 className="">Cities Management</h1>
+                    <h1>Cities Management</h1>
 
                     <div className="header-controls">
                         <div className="controls-left">
@@ -247,12 +247,11 @@ const CityList = () => {
                                     placeholder="Enter city ID"
                                     value={searchId}
                                     onChange={(e) => setSearchId(e.target.value)}
-                                    className=""
                                 />
                                 <button
                                     onClick={handleSearchById}
                                     disabled={!searchId.trim() || searchLoading}
-                                    className=""
+                                    className="btn btn-secondary"
                                 >
                                     {searchLoading ? 'Searching...' : 'Search by ID'}
                                 </button>
@@ -262,30 +261,30 @@ const CityList = () => {
                         <div className="controls-right">
                             {hasActiveFilters && (
                                 <div className="filter-indicator">
-                                    <span className="">
+                                    <span className="active-filters-badge">
                                         {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} active
                                     </span>
                                     <button
                                         onClick={clearAllFilters}
-                                        className=""
+                                        className="btn-clear-all"
                                     >
                                         Clear All
                                     </button>
                                 </div>
                             )}
 
-                            <div className="">
+                            <div className="controls-right">
                                 <button
                                     onClick={handleAddCity}
                                     disabled={showForm}
-                                    className=""
+                                    className="btn btn-primary"
                                 >
                                     Add New City
                                 </button>
 
                                 <button
                                     onClick={goToSpecialFunctions}
-                                    className=""
+                                    className="btn btn-special"
                                 >
                                     Special Functions
                                 </button>
