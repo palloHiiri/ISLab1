@@ -137,7 +137,6 @@ const ErrorNotification = ({
                 <button
                     onClick={handleClose}
                     className="notification-toast-close"
-                    // onKeyPress={(e) => e.key === 'Enter' && handleClose()}
                 >
                     ×
                 </button>
@@ -157,7 +156,6 @@ const ErrorNotification = ({
     );
 };
 
-// Hook for managing notifications
 export const useNotification = () => {
     const [notification, setNotification] = useState({
         message: '',

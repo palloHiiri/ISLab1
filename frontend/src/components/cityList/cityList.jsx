@@ -45,11 +45,9 @@ const CityList = () => {
         navigate('/special-functions');
     };
 
-    // WebSocket соединение
     useEffect(() => {
         fetchCities();
 
-        // Создаем WebSocket соединение
         ws.current = new WebSocket(`ws://localhost:8080/ws/cities`);
 
         ws.current.onopen = () => {
@@ -78,7 +76,6 @@ const CityList = () => {
             console.log('WebSocket disconnected:', event.code, event.reason);
         };
 
-        // Очистка при размонтировании компонента
         return () => {
             if (ws.current && ws.current.readyState === WebSocket.OPEN) {
                 ws.current.close(1000, 'Component unmounting');
@@ -88,7 +85,7 @@ const CityList = () => {
                 clearTimeout(filterTimeoutRef.current);
             }
         };
-    }, []); // Пустой массив зависимостей - выполняется только при монтировании
+    }, []);
 
     const fetchCities = async (silent = false) => {
         try {
@@ -113,10 +110,9 @@ const CityList = () => {
         }
     };
 
-    // Обновляем данные при изменении пагинации, фильтров или сортировки
     useEffect(() => {
         fetchCities();
-    }, [currentPage, sortBy, sortDirection]); // Добавляем зависимости
+    }, [currentPage, sortBy, sortDirection]);
 
     const handleFilterChange = (field, value) => {
         setFilters(prev => ({ ...prev, [field]: value }));

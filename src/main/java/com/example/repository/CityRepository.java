@@ -21,12 +21,6 @@ public class CityRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    public List<City> findAll() {
-        try (var session = sessionFactory.openSession()) {
-            return session.createQuery("from City", City.class).list();
-        }
-    }
-
     public City findById(Long id) {
         try (var session = sessionFactory.openSession()) {
             return session.get(City.class, id);
@@ -103,14 +97,6 @@ public class CityRepository {
         }
     }
 
-    public void delete(City city) {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = null;
-            transaction = session.beginTransaction();
-            session.delete(city);
-            transaction.commit();
-        }
-    }
 
     public Double getSumOfTimezones() {
         try (Session session = sessionFactory.openSession()) {
@@ -238,55 +224,46 @@ public class CityRepository {
             StringBuilder hql = new StringBuilder("FROM City c WHERE 1=1");
             Map<String, Object> params = new HashMap<>();
 
-            // Фильтр по ID
             if (filters.get("id") != null && !filters.get("id").trim().isEmpty()) {
                 hql.append(" AND CAST(c.id AS string) LIKE :id");
                 params.put("id", "%" + filters.get("id").trim() + "%");
             }
 
-            // Фильтр по имени
             if (filters.get("name") != null && !filters.get("name").trim().isEmpty()) {
                 hql.append(" AND LOWER(c.name) LIKE :name");
                 params.put("name", "%" + filters.get("name").trim().toLowerCase() + "%");
             }
 
-            // Фильтр по координатам X
             if (filters.get("coordinatesX") != null && !filters.get("coordinatesX").trim().isEmpty()) {
                 hql.append(" AND CAST(c.coordinates.x AS string) LIKE :coordinatesX");
                 params.put("coordinatesX", "%" + filters.get("coordinatesX").trim() + "%");
             }
 
-            // Фильтр по координатам Y
             if (filters.get("coordinatesY") != null && !filters.get("coordinatesY").trim().isEmpty()) {
                 hql.append(" AND CAST(c.coordinates.y AS string) LIKE :coordinatesY");
                 params.put("coordinatesY", "%" + filters.get("coordinatesY").trim() + "%");
             }
 
-            // Фильтр по дате создания
             if (filters.get("creationDate") != null && !filters.get("creationDate").trim().isEmpty()) {
                 hql.append(" AND CAST(c.creationDate AS string) LIKE :creationDate");
                 params.put("creationDate", "%" + filters.get("creationDate").trim() + "%");
             }
 
-            // Фильтр по площади
             if (filters.get("area") != null && !filters.get("area").trim().isEmpty()) {
                 hql.append(" AND CAST(c.area AS string) LIKE :area");
                 params.put("area", "%" + filters.get("area").trim() + "%");
             }
 
-            // Фильтр по популяции
             if (filters.get("population") != null && !filters.get("population").trim().isEmpty()) {
                 hql.append(" AND CAST(c.population AS string) LIKE :population");
                 params.put("population", "%" + filters.get("population").trim() + "%");
             }
 
-            // Фильтр по дате основания
             if (filters.get("establishmentDate") != null && !filters.get("establishmentDate").trim().isEmpty()) {
                 hql.append(" AND CAST(c.establishmentDate AS string) LIKE :establishmentDate");
                 params.put("establishmentDate", "%" + filters.get("establishmentDate").trim() + "%");
             }
 
-            // Фильтр по статусу столицы
             if (filters.get("capital") != null && !filters.get("capital").trim().isEmpty()) {
                 String capitalValue = filters.get("capital").trim().toLowerCase();
                 if (capitalValue.equals("true") || capitalValue.equals("yes") || capitalValue.equals("1")) {
@@ -296,37 +273,31 @@ public class CityRepository {
                 }
             }
 
-            // Фильтр по метрам над уровнем моря
             if (filters.get("metersAboveSeaLevel") != null && !filters.get("metersAboveSeaLevel").trim().isEmpty()) {
                 hql.append(" AND CAST(c.metersAboveSeaLevel AS string) LIKE :metersAboveSeaLevel");
                 params.put("metersAboveSeaLevel", "%" + filters.get("metersAboveSeaLevel").trim() + "%");
             }
 
-            // Фильтр по часовому поясу
             if (filters.get("timezone") != null && !filters.get("timezone").trim().isEmpty()) {
                 hql.append(" AND CAST(c.timezone AS string) LIKE :timezone");
                 params.put("timezone", "%" + filters.get("timezone").trim() + "%");
             }
 
-            // Фильтр по коду машины
             if (filters.get("carCode") != null && !filters.get("carCode").trim().isEmpty()) {
                 hql.append(" AND CAST(c.carCode AS string) LIKE :carCode");
                 params.put("carCode", "%" + filters.get("carCode").trim() + "%");
             }
 
-            // Фильтр по правительству
             if (filters.get("government") != null && !filters.get("government").trim().isEmpty()) {
                 hql.append(" AND LOWER(CAST(c.government AS string)) LIKE :government");
                 params.put("government", "%" + filters.get("government").trim().toLowerCase() + "%");
             }
 
-            // Фильтр по губернатору
             if (filters.get("governor") != null && !filters.get("governor").trim().isEmpty()) {
                 hql.append(" AND LOWER(c.governor.name) LIKE :governor");
                 params.put("governor", "%" + filters.get("governor").trim().toLowerCase() + "%");
             }
 
-            // Добавляем сортировку по всем полям
             hql.append(" ORDER BY ");
             switch (sortBy.toLowerCase()) {
                 case "id":
@@ -387,7 +358,6 @@ public class CityRepository {
 
             Query<City> query = session.createQuery(hql.toString(), City.class);
 
-            // Устанавливаем параметры фильтров
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 query.setParameter(entry.getKey(), entry.getValue());
             }
@@ -401,7 +371,6 @@ public class CityRepository {
 
         } catch (Exception e) {
             System.err.println("Error in findWithFiltersAndSort: " + e.getMessage());
-            e.printStackTrace();
             return List.of();
         }
     }

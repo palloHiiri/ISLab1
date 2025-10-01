@@ -2,6 +2,7 @@ package com.example.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -63,21 +64,13 @@ public class CityWebSocketHandler extends TextWebSocketHandler {
             System.err.println("Ошибка создания WebSocket сообщения: " + e.getMessage());
         }
     }
-
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WebSocketMessage {
         private String type;
         private Object data;
 
-        public WebSocketMessage() {}
-
-        public WebSocketMessage(String type, Object data) {
-            this.type = type;
-            this.data = data;
-        }
-
-        public String getType() { return type; }
-        public void setType(String type) { this.type = type; }
-        public Object getData() { return data; }
-        public void setData(Object data) { this.data = data; }
     }
 }

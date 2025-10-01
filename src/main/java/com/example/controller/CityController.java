@@ -91,7 +91,7 @@ public class CityController {
     public ResponseEntity<?> getAllCities(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size,
-            // Фильтры для всех полей
+
             @RequestParam(value = "idFilter", defaultValue = "") String idFilter,
             @RequestParam(value = "nameFilter", defaultValue = "") String nameFilter,
             @RequestParam(value = "coordinatesXFilter", defaultValue = "") String coordinatesXFilter,

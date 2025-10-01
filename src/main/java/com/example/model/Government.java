@@ -10,4 +10,15 @@ public enum Government {
     MATRIARCHY,
     NOOCRACY,
     PATRIARCHY;
+
+
+    @Override
+    public String toString() {
+        return name();
+    }
+
+    public static Government fromString(String value) {
+        return valueOf(value);
+    }
+
 }

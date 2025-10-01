@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.example.model">
+    <class name="City" table="cities">
+        <id name="id" type="java.lang.Long">
+            <column name="id"/>
+            <generator class="identity"/>
+        </id>
+
+        <property name="name" type="java.lang.String">
+            <column name="name" length="100" not-null="true"/>
+        </property>
+
+        <component name="coordinates" class="Coordinates">
+            <property name="x" type="java.lang.Long">
+                <column name="x" not-null="true"/>
+            </property>
+            <property name="y" type="java.lang.Long">
+                <column name="y" not-null="true"/>
+            </property>
+        </component>
+
+        <property name="creationDate" type="java.time.LocalDate">
+            <column name="creation_date"/>
+        </property>
+
+        <property name="area" type="java.lang.Double">
+            <column name="area" not-null="true"/>
+        </property>
+
+        <property name="population" type="java.lang.Long">
+            <column name="population" not-null="true"/>
+        </property>
+
+        <property name="establishmentDate" type="java.time.LocalDate">
+            <column name="establishment_date"/>
+        </property>
+
+        <property name="capital" type="boolean">
+            <column name="capital" not-null="true"/>
+        </property>
+
+        <property name="metersAboveSeaLevel" type="java.lang.Float">
+            <column name="meters_above_sea_level"/>
+        </property>
+
+        <property name="timezone" type="java.lang.Integer">
+            <column name="timezone" not-null="true"/>
+        </property>
+
+        <property name="carCode" type="java.lang.Integer">
+            <column name="car_code" not-null="false"/>
+        </property>
+
+        <property name="government">
+            <column name="government" not-null="true"/>
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.example.model.Government</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+
+        <component name="governor" class="Human">
+            <property name="name" type="java.lang.String">
+                <column name="governor_name"/>
+            </property>
+        </component>
+    </class>
+</hibernate-mapping>

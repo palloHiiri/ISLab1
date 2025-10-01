@@ -1,5 +1,3 @@
-/* CityFormModal.css */
-
 .city-form-modal-overlay {
     position: fixed;
     top: 0;
@@ -92,7 +90,6 @@
     gap: 12px;
 }
 
-/* Стили для формы — можно оставить как есть или адаптировать */
 .city-form-modal-body .form-group {
     margin-bottom: 16px;
 }
@@ -135,7 +132,6 @@
 .city-form-modal-body .grid-cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 .city-form-modal-body .grid-cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .city-form-modal-body .grid-cols-2,
     .city-form-modal-body .grid-cols-3,

@@ -24,9 +24,11 @@ public class CityService {
 
     @Transactional
     public Long addCity(City city) {
+        if (city.getCreationDate() == null) {
+            city.setCreationDate(java.time.LocalDate.now());
+        }
         Long id = cityRepository.save(city);
         webSocketHandler.broadcastUpdate("CITY_ADDED", city);
-        System.out.println("мяу");
         return id;
     }
 
@@ -35,21 +37,10 @@ public class CityService {
         return cityRepository.findById(id);
     }
 
-    @Transactional(readOnly = true)
-    public List<City> getAllCities() {
-        return cityRepository.findAll();
-    }
-
     @Transactional
     public void updateCity(City city) {
         webSocketHandler.broadcastUpdate("CITY_UPDATED", city);
         cityRepository.update(city);
-        System.out.println("мяу");
-    }
-
-    @Transactional
-    public void deleteCity(City city) {
-        cityRepository.delete(city);
     }
 
     @Transactional(readOnly = true)

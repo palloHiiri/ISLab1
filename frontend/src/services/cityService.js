@@ -18,12 +18,10 @@ class CityService {
         try {
             const response = await fetch(url, config);
 
-            // Handle different response scenarios
             if (response.status === 204) {
                 return { success: true };
             }
 
-            // Try to parse response as JSON
             let responseData;
             const contentType = response.headers.get('content-type');
 
@@ -34,13 +32,11 @@ class CityService {
             }
 
             if (!response.ok) {
-                // If backend sends structured error response, use it
                 if (responseData && responseData.message) {
                     throw new Error(responseData.message);
                 } else if (responseData && responseData.error) {
                     throw new Error(responseData.error);
                 } else {
-                    // Fallback error messages
                     switch (response.status) {
                         case 400:
                             throw new Error('Invalid request data. Please check your input.');
@@ -69,13 +65,11 @@ class CityService {
             return responseData;
 
         } catch (error) {
-            // Network errors or other fetch errors
             if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 throw new Error('Network error. Please check your connection and try again.');
             } else if (error.name === 'AbortError') {
                 throw new Error('Request timed out. Please try again.');
             } else {
-                // Re-throw our custom errors or other errors
                 throw error;
             }
         }
@@ -90,7 +84,6 @@ class CityService {
                 sortDirection: sortDirection
             });
 
-            // Add filters with proper names that backend expects
             if (filters.id) params.append('idFilter', filters.id);
             if (filters.name) params.append('nameFilter', filters.name);
             if (filters.coordinatesX) params.append('coordinatesXFilter', filters.coordinatesX);
@@ -150,7 +143,6 @@ class CityService {
                 throw new Error('City data is required');
             }
 
-            // Client-side validation for better UX
             this.validateCityData(city);
 
             return await this.request(`/update-by-id/${id}`, {
@@ -197,10 +189,6 @@ class CityService {
             if (timezone === null || timezone === undefined) {
                 throw new Error('Timezone value is required');
             }
-
-            // if (timezone < -13 || timezone > 15) {
-            //     throw new Error('Timezone must be between -13 and 15');
-            // }
 
             return await this.request(`/timezone-less-than/${timezone}`);
         } catch (error) {

@@ -1,4 +1,4 @@
-/* Modal Notification Styles */
+
 .notification-modal-overlay {
     position: fixed;
     top: 0;
@@ -115,7 +115,6 @@
     animation: progressShrink linear forwards;
 }
 
-/* Error styles */
 .notification-error .notification-modal-header {
     background-color: #fef2f2;
     border-bottom-color: #fecaca;
@@ -138,7 +137,6 @@
     background-color: #dc2626;
 }
 
-/* Success styles */
 .notification-success .notification-modal-header {
     background-color: #f0fdf4;
     border-bottom-color: #bbf7d0;
@@ -161,7 +159,6 @@
     background-color: #16a34a;
 }
 
-/* Warning styles */
 .notification-warning .notification-modal-header {
     background-color: #fffbeb;
     border-bottom-color: #fed7aa;
@@ -184,7 +181,6 @@
     background-color: #d97706;
 }
 
-/* Info styles */
 .notification-info .notification-modal-header {
     background-color: #eff6ff;
     border-bottom-color: #bfdbfe;
@@ -207,7 +203,6 @@
     background-color: #2563eb;
 }
 
-/* Toast Notification Styles (fallback) */
 .notification-toast {
     position: fixed;
     top: 20px;
@@ -276,7 +271,6 @@
     animation: progressShrink linear forwards;
 }
 
-/* Toast type styles */
 .notification-toast.notification-error {
     border-left: 4px solid #dc2626;
 }
@@ -309,7 +303,6 @@
     background-color: #2563eb;
 }
 
-/* Animations */
 @keyframes overlayFadeIn {
     from {
         opacity: 0;
@@ -381,7 +374,6 @@
     }
 }
 
-/* Responsive */
 @media (max-width: 640px) {
     .notification-modal {
         width: 95%;

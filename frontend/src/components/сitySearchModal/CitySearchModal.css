@@ -100,7 +100,6 @@
     background-color: #2563eb;
 }
 
-/* Адаптивность для мобильных */
 @media (max-width: 640px) {
     .city-search-modal-body > div {
         grid-template-columns: 1fr;

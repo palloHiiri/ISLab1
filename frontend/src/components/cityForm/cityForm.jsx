@@ -23,7 +23,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
-    // Данные для выбора существующих значений
     const [existingData, setExistingData] = useState({
         governors: [],
         coordinates: [],
@@ -32,12 +31,9 @@ const CityForm = ({ city, onSave, onCancel }) => {
     });
     const [isLoadingExistingData, setIsLoadingExistingData] = useState(false);
 
-    // Состояния для режима выбора/ввода
     const [inputModes, setInputModes] = useState({
-        governor: 'input', // 'select' или 'input'
+        governor: 'input',
         coordinates: 'input',
-        timezone: 'input',
-        carCode: 'input'
     });
 
     useEffect(() => {
@@ -60,7 +56,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
                 cityService.getCoordinates()
             ]);
 
-            // Извлекаем уникальные значения timezone и carCode из координат и других данных
             const timezones = [...new Set(coordinates.map(coord => coord.timezone))].sort((a, b) => a - b);
             const carCodes = [...new Set(coordinates.map(coord => coord.carCode).filter(code => code !== null))].sort((a, b) => a - b);
 
@@ -235,10 +230,8 @@ const CityForm = ({ city, onSave, onCancel }) => {
         onCancel();
     };
 
-    // Вспомогательная функция для отображения ошибок
     const getError = (field) => errors[field] || (field === 'governorName' ? errors.governorName : null);
 
-    // Функция для форматирования координат для отображения
     const formatCoordinates = (coord) => `(${coord.x}, ${coord.y})`;
 
     return (
@@ -283,7 +276,7 @@ const CityForm = ({ city, onSave, onCancel }) => {
                     </div>
 
                     <div className="city-form-modal-body">
-                        {/* Basic Info */}
+
                         <div className={`city-form-modal-section ${activeTab === 'basic' ? 'active' : ''}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="form-group">
@@ -323,7 +316,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
                             </div>
                         </div>
 
-                        {/* Coordinates */}
                         <div className={`city-form-modal-section ${activeTab === 'coordinates' ? 'active' : ''}`}>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
@@ -391,7 +383,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
                             </div>
                         </div>
 
-                        {/* Government */}
                         <div className={`city-form-modal-section ${activeTab === 'government' ? 'active' : ''}`}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="form-group">
@@ -421,7 +412,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
                             </div>
                         </div>
 
-                        {/* Additional */}
                         <div className={`city-form-modal-section ${activeTab === 'additional' ? 'active' : ''}`}>
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -478,7 +468,6 @@ const CityForm = ({ city, onSave, onCancel }) => {
                             </div>
                         </div>
 
-                        {/* Governor */}
                         <div className={`city-form-modal-section ${activeTab === 'governor' ? 'active' : ''}`}>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">

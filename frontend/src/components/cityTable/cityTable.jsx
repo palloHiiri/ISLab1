@@ -58,7 +58,6 @@ const TableHeader = ({ field, label, filterType = 'text', options = [], filters,
     );
 };
 
-// Главный компонент таблицы
 const CityTable = ({
                        cities,
                        filters,
