@@ -19,6 +19,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(cityWebSocketHandler, "/ws/cities")
-                .setAllowedOriginPatterns("http://localhost:*");
+                .setAllowedOrigins("*");
     }
 }

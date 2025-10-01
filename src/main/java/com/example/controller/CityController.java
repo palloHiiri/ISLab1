@@ -24,7 +24,6 @@ public class CityController {
     @PostMapping("/add")
     public ResponseEntity<?> addCity(@RequestBody City city) {
         try {
-            // Validate city data
             if (city.getName() == null || city.getName().trim().isEmpty()) {
                 return createErrorResponse("City name is required", HttpStatus.BAD_REQUEST);
             }
@@ -61,11 +60,10 @@ public class CityController {
                 return createErrorResponse("Governor name is required", HttpStatus.BAD_REQUEST);
             }
 
-            Long id = cityService.addCity(city);
+            cityService.addCity(city);
             return ResponseEntity.ok(city);
         } catch (Exception e) {
             System.err.println("Error adding city: " + e.getMessage());
-            e.printStackTrace();
             return createErrorResponse("Failed to add city: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -168,7 +166,6 @@ public class CityController {
 
         } catch (Exception e) {
             System.err.println("Error in getAllCities: " + e.getMessage());
-            e.printStackTrace();
             return createErrorResponse("Failed to retrieve cities: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -180,13 +177,11 @@ public class CityController {
                 return createErrorResponse("Invalid city ID", HttpStatus.BAD_REQUEST);
             }
 
-            // Check if city exists
             City existingCity = cityService.getCity(id);
             if (existingCity == null) {
                 return createErrorResponse("City with ID " + id + " not found", HttpStatus.NOT_FOUND);
             }
 
-            // Validate city data (same validation as in add)
             if (city.getName() == null || city.getName().trim().isEmpty()) {
                 return createErrorResponse("City name is required", HttpStatus.BAD_REQUEST);
             }
@@ -228,7 +223,6 @@ public class CityController {
             return ResponseEntity.ok(city);
         } catch (Exception e) {
             System.err.println("Error updating city: " + e.getMessage());
-            e.printStackTrace();
             return createErrorResponse("Failed to update city: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -242,7 +236,6 @@ public class CityController {
 
             City city = cityService.getCity(id);
             if (city != null) {
-                // Используем каскадное удаление вместо обычного
                 cityService.deleteCityCascade(city);
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
@@ -330,9 +323,6 @@ public class CityController {
         }
     }
 
-    /**
-     * Helper method to create consistent error responses
-     */
     private ResponseEntity<Map<String, Object>> createErrorResponse(String message, HttpStatus status) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("success", false);

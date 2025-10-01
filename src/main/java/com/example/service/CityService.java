@@ -26,6 +26,7 @@ public class CityService {
     public Long addCity(City city) {
         Long id = cityRepository.save(city);
         webSocketHandler.broadcastUpdate("CITY_ADDED", city);
+        System.out.println("мяу");
         return id;
     }
 
@@ -41,8 +42,9 @@ public class CityService {
 
     @Transactional
     public void updateCity(City city) {
-        cityRepository.update(city);
         webSocketHandler.broadcastUpdate("CITY_UPDATED", city);
+        cityRepository.update(city);
+        System.out.println("мяу");
     }
 
     @Transactional
