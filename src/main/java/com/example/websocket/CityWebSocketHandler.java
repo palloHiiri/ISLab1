@@ -24,6 +24,7 @@ public class CityWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        System.out.println("Подключили вебсокет");
         sessions.add(session);
         System.out.println("WebSocket соединение установлено: " + session.getId());
     }
@@ -40,6 +41,7 @@ public class CityWebSocketHandler extends TextWebSocketHandler {
     }
 
     public void broadcastUpdate(String type, Object data) {
+        System.out.println("broadcastUpdate: " + type + " " + data);
 
         if (sessions.isEmpty()) return;
 

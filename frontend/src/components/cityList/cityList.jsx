@@ -48,7 +48,7 @@ const CityList = () => {
     useEffect(() => {
         fetchCities();
 
-        ws.current = new WebSocket(`ws://localhost:8080/ws/cities`);
+        ws.current = new WebSocket(`/ws/cities`);
 
         ws.current.onopen = () => {
             console.log('WebSocket connected');
@@ -75,6 +75,7 @@ const CityList = () => {
         ws.current.onclose = (event) => {
             console.log('WebSocket disconnected:', event.code, event.reason);
         };
+
 
         return () => {
             if (ws.current && ws.current.readyState === WebSocket.OPEN) {
