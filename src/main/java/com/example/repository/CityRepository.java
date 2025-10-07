@@ -27,35 +27,17 @@ public class CityRepository {
         }
     }
 
-    public void deleteCascade(City city) {
+    public void delete(City city) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-
-            if (city.getCoordinates() != null) {
-                Query<?> coordQuery = session.createQuery(
-                        "delete from City c where c.coordinates.x = :x and c.coordinates.y = :y"
-                );
-                coordQuery.setParameter("x", city.getCoordinates().getX());
-                coordQuery.setParameter("y", city.getCoordinates().getY());
-                int deletedByCoords = coordQuery.executeUpdate();
-                System.out.println("Deleted " + deletedByCoords + " cities by coordinates");
-            }
-
-            if (city.getGovernor() != null && city.getGovernor().getName() != null) {
-                Query<?> govQuery = session.createQuery(
-                        "delete from City c where c.governor.name = :govName"
-                );
-                govQuery.setParameter("govName", city.getGovernor().getName());
-                int deletedByGov = govQuery.executeUpdate();
-                System.out.println("Deleted " + deletedByGov + " cities by governor");
-            }
-
+            session.delete(city);
             transaction.commit();
         } catch (Exception e) {
-            System.err.println("Error in cascade delete: " + e.getMessage());
+            System.err.println("Error in delete: " + e.getMessage());
             throw e;
         }
     }
+
 
     public List<Human> findAllGovernors() {
         try (Session session = sessionFactory.openSession()) {
@@ -116,9 +98,14 @@ public class CityRepository {
         try (var session = sessionFactory.openSession()) {
             Query<Double> query = session.createQuery(
                     "select avg(c.carCode) from City c", Double.class);
-            return query.uniqueResult();
+            Double result = query.uniqueResult();
+            return result != null ? result : 0.0;
+        } catch (Exception e) {
+            System.err.println("Error in getAverageCarCode: " + e.getMessage());
+            return 0.0;
         }
     }
+
 
     public List<City> getCitiesWithTimezoneLessThan(Integer timezone){
         try (Session session = sessionFactory.openSession()) {

@@ -306,6 +306,7 @@ const CityForm = ({ city, onSave, onCancel }) => {
                                 <label>Population *</label>
                                 <input
                                     type="number"
+                                    step="1"
                                     name="population"
                                     value={formData.population}
                                     onChange={handleChange}

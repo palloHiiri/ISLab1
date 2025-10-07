@@ -5,23 +5,15 @@
 
 <hibernate-configuration>
     <session-factory>
-        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/userdb</property>
-        <property name="hibernate.connection.username">postgres</property>
-        <property name="hibernate.connection.password">12345</property>
-
-        <property name="hibernate.connection.pool_size">10</property>
-        <property name="hibernate.connection.autocommit">false</property>
-
+        <property name="hibernate.connection.datasource">java:/jdbc/MyDS</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.hbm2ddl.import_files">schema.sql</property>
 
-        <mapping class="com.example.model.City"/>
-        <mapping class="com.example.model.Coordinates"/>
-        <mapping class="com.example.model.Human"/>
+        <mapping resource="City.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

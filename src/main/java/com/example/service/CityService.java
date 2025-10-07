@@ -75,7 +75,7 @@ public class CityService {
 
     @Transactional
     public void deleteCityCascade(City city) {
-        cityRepository.deleteCascade(city);
+        cityRepository.delete(city);
         webSocketHandler.broadcastUpdate("CITY_DELETED", city);
     }
 
